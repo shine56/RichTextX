@@ -1,6 +1,6 @@
-# RichTextX
+# RichTextX - 富文本编辑和显示
 ## Description
-RichTextX是一个帮助Android应用轻松实现富文本的编辑和显示的组件
+使用 RichTextX 你可以轻松的在Android应用中实现富文本的编辑与显示
 * 基于kotlin、AndroidX
 * 支持文本编辑过程中图像和动画GIF的插入、删除以及点击事件；更改字号；加粗；缩进等富文本编辑；支持Html文件解析。
 * RichTextX中图像的处理和加载由开发者自定义实现，这意味着图文混排的编辑和显示将更加灵活。
@@ -15,10 +15,10 @@ implementation 'com.shine56.richtextx:richtextx:1.0.0'
 
 ```gradle
 <dependency>
-	<groupId>com.shine56.richtextx</groupId>
-	<artifactId>richtextx</artifactId>
-	<version>1.0.0</version>
-	<type>pom</type>
+   <groupId>com.shine56.richtextx</groupId>
+   <artifactId>richtextx</artifactId>
+   <version>1.0.0</version>
+   <type>pom</type>
 </dependency>
 ```
 
@@ -39,7 +39,7 @@ val richEditText = findViewById<RichEditText>(R.id.rich_edit_text)
 
 //插入图片
 richEditText.insertPhoto("R.drawable.example"){
-    getDrawable(R.drawable.example)!!
+    //获取getDrawable逻辑
 }.apply()
 
 //加粗
@@ -51,9 +51,9 @@ richEditText.indent()
 //设置字号
 richEditText.setFontSize(28)
 
-//为图片设置点击事件
+//插入图片同时为其设置点击事件
 richEditText.insertPhoto("R.drawable.example"){
-    getDrawable(R.drawable.example)!!
+    //获取getDrawable逻辑
 }.setOnCLickListener { view, imgUrl ->
     //点击事件逻辑
 }.setOnDeleteListener { view, imgUrl ->
