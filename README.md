@@ -9,7 +9,9 @@
 或者使用Gradle:
 
 ```gradle
-implementation 'com.shine56.richtextx:richtextx:1.0.0'
+dependencies{
+   implementation 'com.shine56.richtextx:richtextx:1.0.0'
+}
 ```
 或者Maven：
 
@@ -23,7 +25,7 @@ implementation 'com.shine56.richtextx:richtextx:1.0.0'
 ```
 
 ## How to use RichTextX
-### 文本编辑示范
+#### EditText example
 像添加EditText一样在布局文件中文件中添加RichEditText
 
 ```xml
@@ -58,10 +60,12 @@ richEditText.insertPhoto("R.drawable.example"){
     //点击事件逻辑
 }.setOnDeleteListener { view, imgUrl ->
     //点击右上角删除事件逻辑
-}
+}.apply()
+
+
 ```
-### 文本显示示范
-像添加EditText一样在布局文件中文件中添加RichTextView
+#### TextView example
+像添加TextView一样在布局文件中文件中添加RichTextView
 ```xml
 <com.shine56.richtextx.RichTextView
     android:id="@+id/rich_text_view"
@@ -77,7 +81,13 @@ val htmlText = Html.toHtml(richEditText.text)
 val richTextView = findViewById<RichTextView>(R.id.rich_text_view)
 val imageGetter = MyImageGetter(this)
 
+richTextView.setTextFromHtml(htmlText, imageGetter).apply()
+
+//为图片设置点击事件
 richTextView.setTextFromHtml(htmlText, imageGetter)
+   .setOnCLickListener { view, imgUrl ->
+       //点击事件逻辑
+   }.apply()
 ```
 ## License
 [Apache License 2.0](https://github.com/shine56/RichTextX/blob/master/LICENSE)
