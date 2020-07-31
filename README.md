@@ -79,8 +79,8 @@ val htmlText = Html.toHtml(richEditText.text)
 //将html字符串显示在RichTextView
 val richTextView = findViewById<RichTextView>(R.id.rich_text_view)
 val imageGetter = MyImageGetter(this)
-
-//setTextFromHtml()第一个参数是html文本，第二个参数是Html.ImageGetter实例，开发者需要写一个类继承Html.ImageGetter，实例化其中getDrawable行为。
+//setTextFromHtml()第一个参数是html文本，第二个参数是Html.ImageGetter实例。
+//开发者需要写一个类继承Html.ImageGetter，实例化其中getDrawable行为。
 richTextView.setTextFromHtml(htmlText, imageGetter).apply()
 
 //为图片设置点击事件
