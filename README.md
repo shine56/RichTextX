@@ -40,7 +40,7 @@ val richEditText = findViewById<RichEditText>(R.id.rich_edit_text)
 
 //插入图片
 richEditText.insertPhoto("R.drawable.example"){
-    //获取getDrawable逻辑
+    //获取drawable逻辑
 }.apply()
 
 //加粗
@@ -80,6 +80,7 @@ val htmlText = Html.toHtml(richEditText.text)
 val richTextView = findViewById<RichTextView>(R.id.rich_text_view)
 val imageGetter = MyImageGetter(this)
 
+//setTextFromHtml()第一个参数是html文本，第二个参数是Html.ImageGetter实例，开发者需要写一个类继承Html.ImageGetter，实例化其中getDrawable行为。
 richTextView.setTextFromHtml(htmlText, imageGetter).apply()
 
 //为图片设置点击事件
