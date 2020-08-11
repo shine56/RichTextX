@@ -126,7 +126,7 @@ class RichText(private val editText: EditText) {
      * 插入spananleString
      */
     private fun setText(spannableString: SpannableString){
-
+        setText("\n")
         val index = editText.selectionStart //获取光标所在位置
         val editableText = editText.editableText
         if (index < 0 || index >= editableText.length) {
@@ -135,17 +135,6 @@ class RichText(private val editText: EditText) {
             editableText.insert(index, spannableString)
         }
         setText("\n")
-//        when(type){
-//            INSERT_PHOTO -> {
-//
-//            }
-//
-//            BOLD -> {
-//
-//            }
-//
-//            SIZE -> {}
-//        }
     }
     private fun setText(string: String){
         val index = editText.selectionStart //获取光标所在位置
