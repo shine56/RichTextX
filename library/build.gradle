@@ -15,7 +15,7 @@ publish {
     userOrg = 'shine56'
     groupId = 'com.shine56.richtextx'
     artifactId = 'richtextx'
-    publishVersion = '1.0.0'
+    publishVersion = '1.0.1'
     desc = 'A tool that allows Android to easily edit and display rich text'
     website = 'https://github.com/shine56/RichTextX'
     repoName = 'RichTextX'
