@@ -4,24 +4,26 @@ import android.text.*
 import android.text.style.AbsoluteSizeSpan
 import android.view.View
 import android.widget.EditText
+import com.shine56.richtextx.api.ImageClick
+import com.shine56.richtextx.api.ImageDelete
 import org.xml.sax.XMLReader
 import java.util.HashMap
 
 class RichTextXTagHandler(
-    private val editText: EditText?,
-    private val imageGetter: Html.ImageGetter
+    private val isEdit: Boolean,
+    private val imageGetter: Html.ImageGetter?
 ) : Html.TagHandler {
 
-    private var onImageDelete: ((view: View, imgUrl: String) -> Unit)? = null
-    private var onImageClick: ((view: View, source: String) -> Unit)? = null
+    private var onImageDelete: ImageDelete? = null
+    private var onImageClick: ImageClick? = null
     private val attributes: HashMap<String, String> = HashMap()
     private var startIndex = 0
     private var stopIndex = 0
 
-    fun setOnImageDeleteListener(listener: (view: View, imgUrl: String) -> Unit){
+    fun setOnImageDeleteListener(listener: ImageDelete){
         onImageDelete = listener
     }
-    fun setOnImageCLickListener(listener: (view: View, imgUrl: String) -> Unit){
+    fun setOnImageCLickListener(listener: ImageClick){
         onImageClick = listener
     }
 
@@ -39,13 +41,10 @@ class RichTextXTagHandler(
         }
     }
 
-    private fun startSpan(
-        tag: String,
-        output: Editable
-    ) {
+    private fun startSpan(tag: String, output: Editable) {
         startIndex = output.length
         if (tag.equals("myimg", ignoreCase = true)) {
-            startImg(output)
+            imageGetter?.let { startImg(output, it) }
         }
     }
 
@@ -61,7 +60,6 @@ class RichTextXTagHandler(
         }
         if (!TextUtils.isEmpty(size)) {
             val fontSize = size!!.toInt()
-
 
             val absoluteSizeSpan = AbsoluteSizeSpan(fontSize, true)
 
@@ -82,7 +80,7 @@ class RichTextXTagHandler(
         }
     }
 
-    private fun startImg(text: Editable) {
+    private fun startImg(text: Editable, imageGetter: Html.ImageGetter) {
         val src = attributes["src"]
 
         val d = imageGetter.getDrawable(src)
@@ -101,15 +99,26 @@ class RichTextXTagHandler(
             imageSpan.setOnCLickListener (it)
         }
 
-        editText?.let{ editText ->
-            onImageDelete?.let { onDelete ->
-                imageSpan.setOnDeleteListener {
-                    val text = editText.text
+//        editText?.let{ editText ->
+//            onImageDelete?.let { onDelete ->
+//                imageSpan.setOnDeleteListener(ImageDelete { view, url ->
+//                    val text = editText.text
+//                    val start = text.getSpanStart(imageSpan)
+//                    val end = text.getSpanEnd(imageSpan)
+//                    text.delete(start, end)
+//                    onDelete.invoke(it, src?:"null")
+//                })
+//            }
+//        }
+
+        if(isEdit){
+            onImageDelete?.let { delete ->
+                imageSpan.setOnDeleteListener(ImageDelete { view, url ->
                     val start = text.getSpanStart(imageSpan)
                     val end = text.getSpanEnd(imageSpan)
                     text.delete(start, end)
-                    onDelete.invoke(it, src?:"null")
-                }
+                    delete.onDelete(view, url)
+                })
             }
         }
 

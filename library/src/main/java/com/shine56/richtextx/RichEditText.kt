@@ -1,37 +1,17 @@
 package com.shine56.richtextx
 
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.text.Editable
 import android.text.Html
 import android.text.TextWatcher
 import android.util.AttributeSet
-import android.view.View
+import androidx.appcompat.widget.AppCompatEditText
+import com.shine56.richtextx.api.*
 
-class RichEditText : androidx.appcompat.widget.AppCompatEditText {
+class RichEditText : AppCompatEditText, RichEditX, HtmlTextX {
 
-    constructor(context: Context): super(context){
-
-    }
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
-    }
-    constructor(context: Context, attributeSet: AttributeSet, defStyleAttr: Int): super(context, attributeSet, defStyleAttr){
-
-    }
-
-    var isBold = false
-
-    private val editText = this
-
-    private val richText = RichText(this)
-
-    private var isTextFromHtml = false
-
-    private var onTextChanged :
-            ((s: CharSequence?, start: Int, before: Int, count: Int) -> Unit)? = null
-    fun setOnTextChangedListener(listener: (s: CharSequence?, start: Int, before: Int, count: Int) -> Unit){
-        onTextChanged = listener
-    }
+    private var isInitTextFromHtml = false //判断是否为初次加载html文本
+    private val richEditUtil by lazy { RichEditUtil(this) }
 
     init {
         //设置span点击事件movementMethod
@@ -43,112 +23,101 @@ class RichEditText : androidx.appcompat.widget.AppCompatEditText {
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 //s.toString().logD("s = ")
-                //richText.isCanSetFont(s?.isEmpty()?: false)
+                //richEditUtil.isCanSetFont(s?.isEmpty()?: false)
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // s.toString().logD("输入中：")
-                //加粗
-                richText.setBold(isBold)
-                //字体
-                if(!isTextFromHtml)
-                    richText.setFontSizeSpan(start, start+count, before)
-
-                onTextChanged?.invoke(s, start, before, count)
+                //加粗与字号
+                if(!isInitTextFromHtml)
+                    richEditUtil.setFontSizeAndBoldSpan(start, start+count, before)
             }
         })
     }
 
-    /**
-     * 初始化html文本
-     */
+    override fun insertPhoto(imgUrl: String, drawableGet: DrawableGet): PhotoBuilder {
+        return InsertPhotoBuilder(imgUrl, drawableGet)
+    }
 
-    fun setTextFromHtml(htmlText: String, imageGetter: Html.ImageGetter): ParseHtmlBuilder{
+//    fun insertPhoto(imgUrl: String, block: (imgUrl: String) -> Drawable): PhotoBuilder {
+//        val drawableGet = DrawableGet(block)
+//        return InsertPhotoBuilder(imgUrl, drawableGet)
+//    }
+
+    override fun getBold(): Boolean = richEditUtil.isBold
+    override fun setBold(isBold: Boolean) {
+        richEditUtil.isBold = isBold
+    }
+
+    override fun getFontSize(): Int = richEditUtil.fontSize
+    override fun setFontSize(fontSize: Int) {
+        richEditUtil.fontSize = fontSize
+    }
+
+    override fun indent() = richEditUtil.indent()
+
+    override fun setTextFromHtml(htmlText: String, imageGetter: Html.ImageGetter?): PhotoBuilder {
         return ParseHtmlBuilder(htmlText, imageGetter)
     }
-
-    /**
-     * 插入图片
-     */
-    fun insertPhoto(
-        imageUrl: String,
-        getDrawable: (imagePath: String) -> Drawable
-    ): InsertPhotoBuilder{
-        return InsertPhotoBuilder(imageUrl, getDrawable)
-    }
-
-    /**
-     * 缩进
-     */
-    fun indent(){
-        val index = selectionStart //获取光标所在位置
-        val editableText = editableText
-        if (index < 0 || index >= editableText.length) {
-            editableText.append("\u3000\u3000")
-        } else {
-            editableText.insert(index, "\u3000\u3000")
-        }
-    }
-
-    /**
-     * 字号
-     */
-    fun setFontSize(fontSize: Int){
-        richText.setFontSize(fontSize)
-    }
-
-    /**
-     * 加粗
-     */
-    fun setFontStyleBold(boolean: Boolean){
-        isBold = boolean
-    }
+//    private var onTextChanged :
+//            ((s: CharSequence?, start: Int, before: Int, count: Int) -> Unit)? = null
+//    fun setOnTextChangedListener(listener: (s: CharSequence?, start: Int, before: Int, count: Int) -> Unit){
+//        onTextChanged = listener
+//    }
 
     inner class InsertPhotoBuilder(
-        private val imageUrl: String,
-        private val getDrawable: (imagePath: String) -> Drawable
-    ){
-//        private var onClick: ((view: View, imgUrl: String) -> Unit)? = null
-//        private var onDelete: ((view: View, imgUrl: String) -> Unit)? = null
+        private val imgUrl: String,
+        private val drawableGet: DrawableGet
+    ): PhotoBuilder{
 
-        fun setOnCLickListener(listener: (view: View, imgUrl: String) -> Unit): InsertPhotoBuilder{
-            richText.setOnImageCLickListener(listener)
-            return this
-        }
-        fun setOnDeleteListener(listener: (view: View, imgUrl: String) -> Unit): InsertPhotoBuilder{
-            richText.setOnImageDeleteListener(listener)
+        override fun setOnCLickListener(listener: ImageClick): PhotoBuilder {
+            richEditUtil.setOnImageCLickListener(listener)
             return this
         }
 
-        fun apply(){
-            richText.insertPhoto(imageUrl, getDrawable)
+        override fun setOnDeleteListener(listener: ImageDelete): com.shine56.richtextx.api.PhotoBuilder {
+            richEditUtil.setOnImageDeleteListener(listener)
+            return this
+        }
+
+        override fun apply(){
+            richEditUtil.insertPhoto(imgUrl, drawableGet)
         }
     }
 
-    inner class ParseHtmlBuilder(htmlText: String, imageGetter: Html.ImageGetter){
-        private var properText: String = ""
-
-        private val tagHandler = RichTextXTagHandler(editText, imageGetter)
+    inner class ParseHtmlBuilder(htmlText: String, imageGetter: Html.ImageGetter?): PhotoBuilder{
+        private var customText: String = ""
+        private val tagHandler = RichTextXTagHandler(true, imageGetter)
 
         init {
-            isTextFromHtml = true
+            isInitTextFromHtml = true
 
-            properText = htmlText.replace("span", "myspan")
-            properText = properText.replace("img", "myimg")
+            customText = htmlText.replace("span", "myspan")
+            customText = customText.replace("img", "myimg")
         }
 
-        fun setOnCLickListener(listener: (view: View, imgUrl: String) -> Unit): ParseHtmlBuilder{
+        override fun setOnCLickListener(listener: ImageClick): PhotoBuilder {
             tagHandler.setOnImageCLickListener(listener)
             return this
         }
-        fun setOnDeleteListener(listener: (view: View, imgUrl: String) -> Unit): ParseHtmlBuilder{
+
+        override fun setOnDeleteListener(listener: ImageDelete): PhotoBuilder {
             tagHandler.setOnImageDeleteListener(listener)
             return this
         }
 
-        fun apply(){
-            editText.setText(Html.fromHtml(properText, null, tagHandler))
-            isTextFromHtml = false
+        override fun apply(){
+            setText(Html.fromHtml(customText, null, tagHandler))
+            isInitTextFromHtml = false
         }
     }
+
+    constructor(context: Context): super(context){
+    }
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
+    }
+    constructor(context: Context, attributeSet: AttributeSet, defStyleAttr: Int): super(context, attributeSet, defStyleAttr){
+
+    }
+
+
 }

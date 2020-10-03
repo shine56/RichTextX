@@ -3,53 +3,51 @@ package com.shine56.richtextx
 import android.content.Context
 import android.text.Html
 import android.util.AttributeSet
-import android.view.View
 import androidx.appcompat.widget.AppCompatTextView
+import com.shine56.richtextx.api.HtmlTextX
+import com.shine56.richtextx.api.ImageClick
+import com.shine56.richtextx.api.ImageDelete
+import com.shine56.richtextx.api.PhotoBuilder
 
-class RichTextView: AppCompatTextView {
-    constructor(context: Context): super(context){
-
-    }
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
-    }
-    constructor(context: Context, attributeSet: AttributeSet, defStyleAttr: Int): super(context, attributeSet, defStyleAttr){
-
-    }
-
-    private val textView = this
-
+class RichTextView: AppCompatTextView, HtmlTextX{
     init {
-        this.movementMethod = RichTextXMovementMethod.INSTANCE
+        movementMethod = RichTextXMovementMethod.INSTANCE
     }
 
-    /**
-     * 初始化html文本
-     */
-    fun setTextFromHtml(htmlText: String, imageGetter: Html.ImageGetter): ParseHtmlBuilder {
+    override fun setTextFromHtml(htmlText: String, imageGetter: Html.ImageGetter?): PhotoBuilder {
         return ParseHtmlBuilder(htmlText, imageGetter)
     }
 
-    inner class ParseHtmlBuilder(htmlText: String, imageGetter: Html.ImageGetter){
-        private var properText: String = ""
-
-        private val tagHandler = RichTextXTagHandler(null, imageGetter)
+    inner class ParseHtmlBuilder(htmlText: String, imageGetter: Html.ImageGetter?): PhotoBuilder{
+        private var customText: String = ""
+        private val tagHandler = RichTextXTagHandler(false, imageGetter)
 
         init {
-            properText = htmlText.replace("span", "myspan")
-            properText = properText.replace("img", "myimg")
+            customText = htmlText.replace("span", "myspan")
+            customText = customText.replace("img", "myimg")
         }
 
-        fun setOnCLickListener(listener: (view: View, imgUrl: String) -> Unit): ParseHtmlBuilder{
+        override fun setOnCLickListener(listener: ImageClick): PhotoBuilder {
             tagHandler.setOnImageCLickListener(listener)
             return this
         }
-        fun setOnDeleteListener(listener: (view: View, imgUrl: String) -> Unit): ParseHtmlBuilder{
+
+        override fun setOnDeleteListener(listener: ImageDelete): PhotoBuilder {
             tagHandler.setOnImageDeleteListener(listener)
             return this
         }
 
-        fun apply(){
-            textView.setText(Html.fromHtml(properText, null, tagHandler))
+        override fun apply(){
+            setText(Html.fromHtml(customText, null, tagHandler))
         }
     }
+
+    constructor(context: Context): super(context){
+    }
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
+    }
+    constructor(context: Context, attributeSet: AttributeSet, defStyleAttr: Int): super(context, attributeSet, defStyleAttr){
+    }
+
+
 }
