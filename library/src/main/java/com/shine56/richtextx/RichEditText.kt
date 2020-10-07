@@ -5,6 +5,7 @@ import android.text.Editable
 import android.text.Html
 import android.text.TextWatcher
 import android.util.AttributeSet
+import android.util.Log
 import androidx.appcompat.widget.AppCompatEditText
 import com.shine56.richtextx.api.*
 
@@ -28,6 +29,7 @@ class RichEditText : AppCompatEditText, RichEditX, HtmlTextX {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 //加粗与字号
+                Log.d("调试", "文本改变"+s.toString())
                 if(!isInitTextFromHtml)
                     richEditUtil.setFontSizeAndBoldSpan(start, start+count, before)
             }
@@ -69,17 +71,25 @@ class RichEditText : AppCompatEditText, RichEditX, HtmlTextX {
         private val drawableGet: DrawableGet
     ): PhotoBuilder{
 
+        private lateinit var imageClick: ImageClick
+        private lateinit var imageDelete: ImageDelete
+
         override fun setOnCLickListener(listener: ImageClick): PhotoBuilder {
-            richEditUtil.setOnImageCLickListener(listener)
+            //richEditUtil.setOnImageCLickListener(listener)
+            imageClick = listener
             return this
         }
 
-        override fun setOnDeleteListener(listener: ImageDelete): com.shine56.richtextx.api.PhotoBuilder {
-            richEditUtil.setOnImageDeleteListener(listener)
+        override fun setOnDeleteListener(listener: ImageDelete): PhotoBuilder {
+           // richEditUtil.setOnImageDeleteListener(listener)
+            imageDelete = listener
             return this
         }
 
+        @Synchronized
         override fun apply(){
+            richEditUtil.setOnImageCLickListener(imageClick)
+            richEditUtil.setOnImageDeleteListener(imageDelete)
             richEditUtil.insertPhoto(imgUrl, drawableGet)
         }
     }

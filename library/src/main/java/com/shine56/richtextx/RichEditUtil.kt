@@ -6,6 +6,7 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.StyleSpan
+import android.util.Log
 import android.widget.EditText
 import com.shine56.richtextx.api.DrawableGet
 import com.shine56.richtextx.api.ImageClick
@@ -63,6 +64,7 @@ class RichEditUtil(private val editText: EditText) {
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
             setText(spannableString)
+
 
             //点击事件
             imageSpan.setOnCLickListener(imageClick)

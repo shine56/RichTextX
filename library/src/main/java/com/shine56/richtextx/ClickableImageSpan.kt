@@ -5,6 +5,7 @@ import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.text.style.DynamicDrawableSpan
 import android.text.style.ImageSpan
+import android.util.Log
 import android.view.View
 import com.shine56.richtextx.api.ImageClick
 import com.shine56.richtextx.api.ImageDelete
@@ -26,6 +27,7 @@ class ClickableImageSpan(drawable: Drawable, private val imgUrl: String) :
     }
 
     fun onClick(view: View, touchX: Int, touchY: Int){
+        Log.d("调试", "点击的X$touchX, 点击的Y$touchY, 宽$width, top$top, h=$height")
         if(touchX > width - 100 && touchX < width - 20 &&
             touchY > top +20 && touchY < top+ 100){
             onDelete?.onDelete(view, imgUrl)
@@ -47,11 +49,11 @@ class ClickableImageSpan(drawable: Drawable, private val imgUrl: String) :
         paint: Paint
     ) {
         val bgSize = getSize(paint, text?.substring(start, end), start, end, paint.fontMetricsInt)
-        //"top = $top, bt = $bottom, x = $x, y =$y, bitmap.height = ${bitmap.height}, 宽=$bgSize".logD()
+        Log.d("调试", "top = $top, bt = $bottom, x = $x, y =$y, bitmap.height = ${drawable.intrinsicWidth}, 宽=$bgSize" +
+                ", 画布宽${canvas.width} 画布高${canvas.height}")
         this.top = top
-        this.width = bgSize
+        this.width = canvas.width
         this.height = bottom
         super.draw(canvas, text, start, end, x, top, y, bottom, paint)
-
     }
 }
