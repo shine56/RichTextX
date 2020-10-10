@@ -27,7 +27,7 @@ class ClickableImageSpan(drawable: Drawable, private val imgUrl: String) :
     }
 
     fun onClick(view: View, touchX: Int, touchY: Int){
-        Log.d("调试ClickableImageSpan->", "touchX=$touchX, touchY=$touchY, width=$width, height=$height, top=$top")
+        //Log.d("调试ClickableImageSpan->", "touchX=$touchX, touchY=$touchY, width=$width, height=$height, top=$top")
         if(touchX > width - 100 && touchX < width  &&
             touchY > top && touchY < top+ 100){
             onDelete?.onDelete(view, imgUrl)
@@ -55,7 +55,7 @@ class ClickableImageSpan(drawable: Drawable, private val imgUrl: String) :
         this.height = bottom
         super.draw(canvas, text, start, end, x, top, y, bottom, paint)
 
-        Log.d("调试", "top=$top, height=$height, x = $x, y =$y, drawable.intrinsicWidth=${drawable.intrinsicWidth}, " +
-                "bgSize=$bgSize, 画布宽${canvas.width} 画布高${canvas.height}")
+//        Log.d("调试", "top=$top, height=$height, x = $x, y =$y, drawable.intrinsicWidth=${drawable.intrinsicWidth}, " +
+//                "bgSize=$bgSize, 画布宽${canvas.width} 画布高${canvas.height}")
     }
 }

@@ -3,6 +3,7 @@ package com.shine56.richtextx
 import android.content.Context
 import android.text.Html
 import android.util.AttributeSet
+import android.view.View
 import androidx.appcompat.widget.AppCompatTextView
 import com.shine56.richtextx.api.HtmlTextX
 import com.shine56.richtextx.api.ImageClick
@@ -32,8 +33,18 @@ class RichTextView: AppCompatTextView, HtmlTextX{
             return this
         }
 
+        override fun setOnCLickListener(block: (view: View, imgUrl: String) -> Unit): PhotoBuilder {
+            tagHandler.setOnImageCLickListener(ImageClick(block))
+            return this
+        }
+
         override fun setOnDeleteListener(listener: ImageDelete): PhotoBuilder {
             tagHandler.setOnImageDeleteListener(listener)
+            return this
+        }
+
+        override fun setOnDeleteListener(block: (view: View, imgUrl: String) -> Unit): PhotoBuilder {
+            tagHandler.setOnImageDeleteListener(ImageDelete(block))
             return this
         }
 

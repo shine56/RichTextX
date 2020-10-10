@@ -40,15 +40,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun insertPhoto(){
-        richEditText.insertPhoto("图片$i", DrawableGet {
-            resources.getDrawable(R.drawable.photo)
-        }).setOnCLickListener(ImageClick { l, l1 ->
-            Toast.makeText(this, "点击$l1", Toast.LENGTH_SHORT).show()
-        }).setOnDeleteListener(ImageDelete{l, l1 ->
-            Toast.makeText(this, "删除$l1", Toast.LENGTH_SHORT).show()
-        }).apply()
-    }
+    private fun insertPhoto() = richEditText.insertPhoto("R.drawable.photo") {
+        resources.getDrawable(R.drawable.photo)
+    }.setOnCLickListener { l, l1 ->
+        Toast.makeText(this, "点击$l1", Toast.LENGTH_SHORT).show()
+    }.setOnDeleteListener { l, l1 ->
+        Toast.makeText(this, "删除$l1", Toast.LENGTH_SHORT).show()
+    }.apply()
     private fun bold(){
         richEditText.setBold(!richEditText.getBold())
     }

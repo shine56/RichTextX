@@ -1,11 +1,13 @@
 package com.shine56.richtextx
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.text.Editable
 import android.text.Html
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.util.Log
+import android.view.View
 import androidx.appcompat.widget.AppCompatEditText
 import com.shine56.richtextx.api.*
 
@@ -28,10 +30,7 @@ class RichEditText : AppCompatEditText, RichEditX, HtmlTextX {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 //加粗与字号
-                Log.d("调试", "文本改变"+s.toString().substring(start, start+count))
                 if(needRefreshText) {
-                    Log.d("调试", "刷新字体")
-                    //Log.d("调试", "文本改变"+s.toString().substring(start, start+count))
                     richEditUtil.setFontSizeAndBoldSpan(start, start+count, before)
                 }
             }
@@ -42,10 +41,10 @@ class RichEditText : AppCompatEditText, RichEditX, HtmlTextX {
         return InsertPhotoBuilder(imgUrl, drawableGet)
     }
 
-//    fun insertPhoto(imgUrl: String, block: (imgUrl: String) -> Drawable): PhotoBuilder {
-//        val drawableGet = DrawableGet(block)
-//        return InsertPhotoBuilder(imgUrl, drawableGet)
-//    }
+    fun insertPhoto(imgUrl: String, block: (imgUrl: String) -> Drawable): PhotoBuilder {
+        val drawableGet = DrawableGet(block)
+        return InsertPhotoBuilder(imgUrl, drawableGet)
+    }
 
     override fun getBold(): Boolean = richEditUtil.isBold
     override fun setBold(isBold: Boolean) {
@@ -90,8 +89,18 @@ class RichEditText : AppCompatEditText, RichEditX, HtmlTextX {
             return this
         }
 
+        override fun setOnCLickListener(block: (view: View, imgUrl: String) -> Unit): PhotoBuilder {
+            imageClick = ImageClick(block)
+            return this
+        }
+
         override fun setOnDeleteListener(listener: ImageDelete): PhotoBuilder {
             imageDelete = listener
+            return this
+        }
+
+        override fun setOnDeleteListener(block: (view: View, imgUrl: String) -> Unit): PhotoBuilder {
+            imageDelete = ImageDelete(block)
             return this
         }
 
@@ -117,8 +126,18 @@ class RichEditText : AppCompatEditText, RichEditX, HtmlTextX {
             return this
         }
 
+        override fun setOnCLickListener(block: (view: View, imgUrl: String) -> Unit): PhotoBuilder {
+            tagHandler.setOnImageCLickListener(ImageClick(block))
+            return this
+        }
+
         override fun setOnDeleteListener(listener: ImageDelete): PhotoBuilder {
             tagHandler.setOnImageDeleteListener(listener)
+            return this
+        }
+
+        override fun setOnDeleteListener(block: (view: View, imgUrl: String) -> Unit): PhotoBuilder {
+            tagHandler.setOnImageDeleteListener(ImageDelete(block))
             return this
         }
 
