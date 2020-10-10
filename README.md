@@ -105,4 +105,4 @@ richTextView.setTextFromHtml(htmlText, imageGetter)
 ## Screenshot
 | 编辑 |显示 |
 |--|--|
-|<img src="https://s1.ax1x.com/2020/10/10/06NlZD.md.jpg" width = "300" height = "900" alt="图片名称" align=center />|<img src="https://s1.ax1x.com/2020/10/10/06NMqO.md.jpg" width = "300" height = "900" alt="图片名称" align=center />
+|<img src="https://s1.ax1x.com/2020/10/10/06NlZD.md.jpg" width = "300" height = "750" alt="图片名称" align=center />|<img src="https://s1.ax1x.com/2020/10/10/06NMqO.md.jpg" width = "300" height = "750" alt="图片名称" align=center />
