@@ -11,8 +11,9 @@ import com.shine56.richtextx.api.*
 
 class RichEditText : AppCompatEditText, RichEditX, HtmlTextX {
 
-    private var isInitTextFromHtml = false //判断是否为初次加载html文本
+    internal var needRefreshText = true //判断是否需要更新文本
     private val richEditUtil by lazy { RichEditUtil(this) }
+    private var photoBuilder: PhotoBuilder? = null
 
     init {
         //设置span点击事件movementMethod
@@ -23,15 +24,16 @@ class RichEditText : AppCompatEditText, RichEditX, HtmlTextX {
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                //s.toString().logD("s = ")
-                //richEditUtil.isCanSetFont(s?.isEmpty()?: false)
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 //加粗与字号
-                Log.d("调试", "文本改变"+s.toString())
-                if(!isInitTextFromHtml)
+                Log.d("调试", "文本改变"+s.toString().substring(start, start+count))
+                if(needRefreshText) {
+                    Log.d("调试", "刷新字体")
+                    //Log.d("调试", "文本改变"+s.toString().substring(start, start+count))
                     richEditUtil.setFontSizeAndBoldSpan(start, start+count, before)
+                }
             }
         })
     }
@@ -66,31 +68,36 @@ class RichEditText : AppCompatEditText, RichEditX, HtmlTextX {
 //        onTextChanged = listener
 //    }
 
+    @Synchronized
+    private fun getPhotoBuilder(imgUrl: String, drawableGet: DrawableGet): PhotoBuilder{
+        photoBuilder?.let {
+            return it
+        }
+        return InsertPhotoBuilder(imgUrl, drawableGet).apply {
+            photoBuilder = this
+        }
+
+    }
     inner class InsertPhotoBuilder(
         private val imgUrl: String,
         private val drawableGet: DrawableGet
     ): PhotoBuilder{
-
-        private lateinit var imageClick: ImageClick
-        private lateinit var imageDelete: ImageDelete
+        private var imageClick: ImageClick? = null
+        private var imageDelete: ImageDelete? = null
 
         override fun setOnCLickListener(listener: ImageClick): PhotoBuilder {
-            //richEditUtil.setOnImageCLickListener(listener)
             imageClick = listener
             return this
         }
 
         override fun setOnDeleteListener(listener: ImageDelete): PhotoBuilder {
-           // richEditUtil.setOnImageDeleteListener(listener)
             imageDelete = listener
             return this
         }
 
-        @Synchronized
         override fun apply(){
-            richEditUtil.setOnImageCLickListener(imageClick)
-            richEditUtil.setOnImageDeleteListener(imageDelete)
-            richEditUtil.insertPhoto(imgUrl, drawableGet)
+            richEditUtil.insertPhoto(imgUrl, drawableGet, imageClick, imageDelete)
+           // richEditUtil.insertPhoto(this)
         }
     }
 
@@ -99,7 +106,7 @@ class RichEditText : AppCompatEditText, RichEditX, HtmlTextX {
         private val tagHandler = RichTextXTagHandler(true, imageGetter)
 
         init {
-            isInitTextFromHtml = true
+            needRefreshText = false
 
             customText = htmlText.replace("span", "myspan")
             customText = customText.replace("img", "myimg")
@@ -117,7 +124,7 @@ class RichEditText : AppCompatEditText, RichEditX, HtmlTextX {
 
         override fun apply(){
             setText(Html.fromHtml(customText, null, tagHandler))
-            isInitTextFromHtml = false
+            needRefreshText = true
         }
     }
 

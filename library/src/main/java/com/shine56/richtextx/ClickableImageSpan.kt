@@ -27,9 +27,9 @@ class ClickableImageSpan(drawable: Drawable, private val imgUrl: String) :
     }
 
     fun onClick(view: View, touchX: Int, touchY: Int){
-        Log.d("调试", "点击的X$touchX, 点击的Y$touchY, 宽$width, top$top, h=$height")
-        if(touchX > width - 100 && touchX < width - 20 &&
-            touchY > top +20 && touchY < top+ 100){
+        Log.d("调试ClickableImageSpan->", "touchX=$touchX, touchY=$touchY, width=$width, height=$height, top=$top")
+        if(touchX > width - 100 && touchX < width  &&
+            touchY > top && touchY < top+ 100){
             onDelete?.onDelete(view, imgUrl)
         }else if(touchX > 30 && touchX < width - 30 &&
             touchY > top +50 && touchY < height - 50){
@@ -49,11 +49,13 @@ class ClickableImageSpan(drawable: Drawable, private val imgUrl: String) :
         paint: Paint
     ) {
         val bgSize = getSize(paint, text?.substring(start, end), start, end, paint.fontMetricsInt)
-        Log.d("调试", "top = $top, bt = $bottom, x = $x, y =$y, bitmap.height = ${drawable.intrinsicWidth}, 宽=$bgSize" +
-                ", 画布宽${canvas.width} 画布高${canvas.height}")
+
         this.top = top
         this.width = canvas.width
         this.height = bottom
         super.draw(canvas, text, start, end, x, top, y, bottom, paint)
+
+        Log.d("调试", "top=$top, height=$height, x = $x, y =$y, drawable.intrinsicWidth=${drawable.intrinsicWidth}, " +
+                "bgSize=$bgSize, 画布宽${canvas.width} 画布高${canvas.height}")
     }
 }
