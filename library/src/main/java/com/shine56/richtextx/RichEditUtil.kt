@@ -161,7 +161,7 @@ class RichEditUtil(private val editText: RichEditText) {
      * @param spannableString SpannableString
      */
     private fun setText(spannableString: SpannableString){
-        //setText("\n")
+        setText("\n")
         val index = editText.selectionStart //获取光标所在位置
         val editableText = editText.editableText
         if (index < 0 || index >= editableText.length) {
@@ -169,7 +169,7 @@ class RichEditUtil(private val editText: RichEditText) {
         } else {
             editableText.insert(index, spannableString)
         }
-        //setText("\n")
+        setText("\n")
     }
 
     /**
