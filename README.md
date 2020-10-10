@@ -105,4 +105,4 @@ richTextView.setTextFromHtml(htmlText, imageGetter)
 ## Screenshot
 | 编辑 |显示 |
 |--|--|
-|![在这里插入图片描述](https://img-blog.csdnimg.cn/20201010215620674.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjYxOTg1Ng==,size_16,color_FFFFFF,t_70#pic_center)|![在这里插入图片描述](https://img-blog.csdnimg.cn/20201010215639185.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjYxOTg1Ng==,size_16,color_FFFFFF,t_70#pic_center)
+|![在这里插入图片描述](https://s1.ax1x.com/2020/10/10/06NlZD.md.jpg)|![在这里插入图片描述](https://s1.ax1x.com/2020/10/10/06NMqO.md.jpg)
