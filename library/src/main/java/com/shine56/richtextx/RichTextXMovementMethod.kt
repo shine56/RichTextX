@@ -30,13 +30,6 @@ class RichTextXMovementMethod: LinkMovementMethod() {
             val line = layout.getLineForVertical(y)
             var off = layout.getOffsetForHorizontal(line, x.toFloat())
 
-//            val xLeft = layout.getPrimaryHorizontal(off)
-//            if (xLeft < x) {
-//                off += 1
-//            } else {
-//                off -= 1
-//            }
-
             val links = buffer!!.getSpans(off, off, ClickableSpan::class.java)
             val imageSpans = buffer!!.getSpans(off, off, ClickableImageSpan::class.java)
 
