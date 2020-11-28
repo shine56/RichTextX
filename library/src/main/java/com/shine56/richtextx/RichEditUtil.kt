@@ -1,6 +1,7 @@
 package com.shine56.richtextx
 
 import android.graphics.*
+import android.graphics.drawable.Drawable
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
@@ -11,9 +12,11 @@ import android.widget.EditText
 import com.shine56.richtextx.api.DrawableGet
 import com.shine56.richtextx.api.ImageClick
 import com.shine56.richtextx.api.ImageDelete
+import com.shine56.richtextx.bean.Image
 import kotlinx.coroutines.*
+import java.lang.Exception
 
-class RichEditUtil(private val editText: RichEditText) {
+class RichEditUtil(private val editText: EditText) {
 
     var fontSize = 15
     var isBold = false
@@ -61,23 +64,21 @@ class RichEditUtil(private val editText: RichEditText) {
 
     /**
      * 使用协程管理插入图片的逻辑。将用户定义的获取drawable的逻辑方式IO线程，在主线程更新UI
-     * @param imagePath String
-     * @param getDrawable Function1<[@kotlin.ParameterName] String, Drawable>
+     * @param image Image
      */
-    fun insertPhoto(
-        imageUrl: String,
-        drawableGet: DrawableGet,
-        imageClick: ImageClick?,
-        imageDelete: ImageDelete?
-    ){
+    fun insertPhoto(image: Image){
+
+        if (image.drawableGet == null){
+            return
+        }
+
         val job = Job()
         val scope = CoroutineScope(job)
 
         //IO线程制作drawable
         val deferred = scope.async(Dispatchers.IO) {
-            drawableGet.getDrawable(imageUrl)
+            image.drawableGet.getDrawable(image.imageUrl)
         }
-
 
         scope.launch(Dispatchers.Main) {
             //获取drawable
@@ -87,34 +88,38 @@ class RichEditUtil(private val editText: RichEditText) {
             mDrawable.setBounds(0, 0, if (width > 0) width else 0, if (height > 0) height else 0)
 
             //设置到edit
-            val imageSpan = ClickableImageSpan(mDrawable, imageUrl)
-            val spannableString = SpannableString(imageUrl)
+            val imageSpan = ClickableImageSpan(mDrawable, image.imageUrl)
+            val spannableString = SpannableString(image.imageUrl)
             spannableString.setSpan(
                 imageSpan,
                 0,
                 spannableString.length,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
-            editText.needRefreshText = false
+            //editText.needRefreshText = false
             setText(spannableString)
 
-            //点击事件
-            imageSpan.setOnCLickListener(imageClick)
+            //点击事件，无需判空
+            Log.d("调试", "insertPhoto: 设置点击事件")
+            if(image.click == null){
+                Log.d("调试", "insertPhoto: 点击事件为空")
+            }
+            imageSpan.setOnCLickListener(image.click)
 
-            //删除事件
-            imageDelete?.let { imageDelete ->
+            //删除事件，如果事件为空则不设置
+            image.delete?.let {
                 imageSpan.setOnDeleteListener(ImageDelete { view, url ->
                     //必须执行的逻辑
-                   editText.text?.let {
-                       val start = it.getSpanStart(imageSpan)
-                       val end = it.getSpanEnd(imageSpan)
-                       it.delete(start, end)
-                   }
+                    editText.text?.let {
+                        val start = it.getSpanStart(imageSpan)
+                        val end = it.getSpanEnd(imageSpan)
+                        it.delete(start, end)
+                    }
                     //用户定义的逻辑
-                    imageDelete.onDelete(view, url)
+                    it.onDelete(view, url)
                 })
             }
-            editText.needRefreshText = true
+            //editText.needRefreshText = true
             //isFree = true
             scope.cancel()
         }

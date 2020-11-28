@@ -4,6 +4,7 @@ import android.text.Selection
 import android.text.Spannable
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.MotionEvent
 import android.widget.TextView
 
@@ -45,7 +46,6 @@ class RichTextXMovementMethod: LinkMovementMethod() {
                             buffer!!.getSpanEnd(link)
                         )
                     }
-                    return true
                 }
                 imageSpans.isNotEmpty() -> {
 
@@ -61,7 +61,6 @@ class RichTextXMovementMethod: LinkMovementMethod() {
 //                            buffer!!.getSpanEnd(link)
 //                        )
                     }
-                    return true
                 }
                 else -> {
                     Selection.removeSelection(buffer)
@@ -71,7 +70,6 @@ class RichTextXMovementMethod: LinkMovementMethod() {
 //        if (action == MotionEvent.ACTION_MOVE){
 //            return true
 //        }
-
-        return false
+        return super.onTouchEvent(widget, buffer, event)
     }
 }

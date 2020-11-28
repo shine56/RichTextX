@@ -27,7 +27,7 @@ class ClickableImageSpan(drawable: Drawable, private val imgUrl: String) :
     }
 
     fun onClick(view: View, touchX: Int, touchY: Int){
-        //Log.d("调试ClickableImageSpan->", "touchX=$touchX, touchY=$touchY, width=$width, height=$height, top=$top")
+        Log.d("调试ClickableImageSpan->", "点击的位置[$touchX, $touchY]  宽[0, $width]  高[$top, $height]")
         if(touchX > width - 100 && touchX < width  &&
             touchY > top && touchY < top+ 100){
             onDelete?.onDelete(view, imgUrl)
