@@ -1,4 +1,4 @@
-package com.shine56.richtextx;
+package com.shine56.richtextx.util;
 
 import android.graphics.drawable.Drawable;
 import android.text.Editable;
@@ -14,6 +14,7 @@ import com.shine56.richtextx.api.DrawableGet;
 import com.shine56.richtextx.api.HtmlTextX;
 import com.shine56.richtextx.api.ImageDelete;
 import com.shine56.richtextx.bean.Image;
+import com.shine56.richtextx.view.ClickableImageSpan;
 
 import org.xml.sax.XMLReader;
 
@@ -78,9 +79,13 @@ public class RtTagHandler implements Html.TagHandler {
 
     private void startImg(Editable text, DrawableGet drawableGet) {
         String src = attributes.get("src");
-        Drawable d = drawableGet.getDrawable(src);
 
-        ClickableImageSpan imageSpan = new ClickableImageSpan(d, src);
+        Drawable drawable = drawableGet.getDrawable(src);
+        int width = drawable.getIntrinsicWidth();
+        int height = drawable.getIntrinsicHeight();
+        drawable.setBounds(0, 0, width > 0? width: 0, height > 0? height : 0);
+
+        ClickableImageSpan imageSpan = new ClickableImageSpan(drawable, src);
         SpannableString spannableString = new SpannableString(src);
 
         spannableString.setSpan(

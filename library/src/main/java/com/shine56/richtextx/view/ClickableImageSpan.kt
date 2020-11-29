@@ -1,4 +1,4 @@
-package com.shine56.richtextx
+package com.shine56.richtextx.view
 
 import android.graphics.Canvas
 import android.graphics.Paint

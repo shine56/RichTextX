@@ -8,9 +8,9 @@ import android.util.AttributeSet;
 
 import androidx.appcompat.widget.AppCompatEditText;
 
-import com.shine56.richtextx.RichEditUtil;
-import com.shine56.richtextx.RichTextXMovementMethod;
-import com.shine56.richtextx.RtTagHandler;
+import com.shine56.richtextx.util.RichEditUtil;
+import com.shine56.richtextx.util.RichTextXMovementMethod;
+import com.shine56.richtextx.util.RtTagHandler;
 import com.shine56.richtextx.api.HtmlTextX;
 import com.shine56.richtextx.api.ImageBuilder;
 import com.shine56.richtextx.util.ImageBuilderImpl;
@@ -44,6 +44,11 @@ public class RichEditText extends AppCompatEditText implements HtmlTextX, RichEd
     @Override
     public ImageBuilder getImageBuilder() {
         return new ImageBuilderImpl();
+    }
+
+    @Override
+    public String getHtmlText() {
+        return Html.toHtml(getEditableText());
     }
 
     @Override

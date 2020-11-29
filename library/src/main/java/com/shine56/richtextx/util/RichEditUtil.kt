@@ -1,7 +1,6 @@
-package com.shine56.richtextx
+package com.shine56.richtextx.util
 
 import android.graphics.*
-import android.graphics.drawable.Drawable
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
@@ -9,12 +8,10 @@ import android.text.style.AbsoluteSizeSpan
 import android.text.style.StyleSpan
 import android.util.Log
 import android.widget.EditText
-import com.shine56.richtextx.api.DrawableGet
-import com.shine56.richtextx.api.ImageClick
 import com.shine56.richtextx.api.ImageDelete
 import com.shine56.richtextx.bean.Image
+import com.shine56.richtextx.view.ClickableImageSpan
 import kotlinx.coroutines.*
-import java.lang.Exception
 
 class RichEditUtil(private val editText: EditText) {
 
@@ -88,7 +85,10 @@ class RichEditUtil(private val editText: EditText) {
             mDrawable.setBounds(0, 0, if (width > 0) width else 0, if (height > 0) height else 0)
 
             //设置到edit
-            val imageSpan = ClickableImageSpan(mDrawable, image.imageUrl)
+            val imageSpan = ClickableImageSpan(
+                mDrawable,
+                image.imageUrl
+            )
             val spannableString = SpannableString(image.imageUrl)
             spannableString.setSpan(
                 imageSpan,

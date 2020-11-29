@@ -7,8 +7,8 @@ import android.util.AttributeSet;
 
 import androidx.appcompat.widget.AppCompatTextView;
 
-import com.shine56.richtextx.RichTextXMovementMethod;
-import com.shine56.richtextx.RtTagHandler;
+import com.shine56.richtextx.util.RichTextXMovementMethod;
+import com.shine56.richtextx.util.RtTagHandler;
 import com.shine56.richtextx.api.HtmlTextX;
 import com.shine56.richtextx.api.ImageBuilder;
 import com.shine56.richtextx.util.ImageBuilderImpl;
@@ -43,6 +43,11 @@ public class RichTextView extends AppCompatTextView implements HtmlTextX {
     @Override
     public ImageBuilder getImageBuilder() {
         return imageBuilder;
+    }
+
+    @Override
+    public String getHtmlText() {
+        return Html.toHtml(getEditableText());
     }
 
     public RichTextView(Context context) {
