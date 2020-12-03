@@ -39,7 +39,6 @@ dependencies{
 
 ```kotlin
 val richEditText = findViewById<RichEditText>(R.id.rich_edit_text)
-
 /**
  * 插入图片
  */
@@ -92,7 +91,6 @@ richEditText.setFontSize(28)
 /**
  * 显示htnl文本
  */
- 
 //将editText的文本转成html字符串
 val htmlText = Html.toHtml(richEditText.text)
 
