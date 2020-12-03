@@ -3,8 +3,12 @@ package com.shine56.richtextx.view;
 import android.content.Context;
 import android.text.Editable;
 import android.text.Html;
+import android.text.Spannable;
 import android.text.TextWatcher;
+import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.inputmethod.InputMethodManager;
 
 import androidx.appcompat.widget.AppCompatEditText;
 
@@ -29,7 +33,7 @@ public class RichEditText extends AppCompatEditText implements HtmlTextX, RichEd
     @Override
     public void setTextFromHtml(String htmlText, Image image) {
         String customText;
-        RtTagHandler tagHandler = new RtTagHandler(image);
+        RtTagHandler tagHandler = new RtTagHandler(image, this);
 
         customText = htmlText.replace("span", mySpan);
         customText = customText.replace("img", myImg);
@@ -114,5 +118,16 @@ public class RichEditText extends AppCompatEditText implements HtmlTextX, RichEd
     public RichEditText(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if(event.getAction() == MotionEvent.ACTION_UP){
+            if(!getShowSoftInputOnFocus())
+                setShowSoftInputOnFocus(true);
+            if(!isCursorVisible())
+                setCursorVisible(true);
+        }
+        return super.onTouchEvent(event);
     }
 }

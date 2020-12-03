@@ -32,7 +32,7 @@ public class RichTextView extends AppCompatTextView implements HtmlTextX {
     @Override
     public void setTextFromHtml(String htmlText, Image image) {
         String customText;
-        RtTagHandler tagHandler = new RtTagHandler(image);
+        RtTagHandler tagHandler = new RtTagHandler(image, null);
 
         customText = htmlText.replace("span", mySpan);
         customText = customText.replace("img", myImg);

@@ -1,3 +1,2 @@
-include ':richtexttest'
 include ':library'
 rootProject.name = "RichTextX"

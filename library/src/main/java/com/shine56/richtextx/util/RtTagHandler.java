@@ -8,10 +8,13 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
+import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 
 import com.shine56.richtextx.api.DrawableGet;
 import com.shine56.richtextx.api.HtmlTextX;
+import com.shine56.richtextx.api.ImageClick;
 import com.shine56.richtextx.api.ImageDelete;
 import com.shine56.richtextx.bean.Image;
 import com.shine56.richtextx.view.ClickableImageSpan;
@@ -22,15 +25,19 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.shine56.richtextx.api.HtmlTextX.TAG;
+
 public class RtTagHandler implements Html.TagHandler {
 
     private Image image;
     private HashMap<String, String> attributes = new HashMap();
     private int startIndex = 0;
     private int stopIndex = 0;
+    private EditText editText = null;
 
-    public RtTagHandler(Image image) {
+    public RtTagHandler(Image image, EditText editText) {
         this.image = image;
+        this.editText = editText;
     }
 
     @Override
@@ -96,17 +103,37 @@ public class RtTagHandler implements Html.TagHandler {
         );
         text.append(spannableString);
 
-        if(image.getClick() != null){
-            imageSpan.setOnCLickListener (image.getClick());
+        //点击事件
+        if(image.getClick()!=null){
+            if(editText != null){
+                imageSpan.setOnCLickListener(new ImageClick() {
+                    @Override
+                    public void onClick(View view, String imgUrl) {
+                        //必须执行的逻辑
+                        editText.setShowSoftInputOnFocus(false);
+                        editText.setCursorVisible(false);
+                        //用户定义的逻辑
+                        image.getClick().onClick(view, imgUrl);
+                    }
+                });
+            }else {
+                imageSpan.setOnCLickListener(image.getClick());
+            }
         }
 
-        if(image.getDelete() != null){
+        //删除事件
+        if(image.getDelete()!=null && editText != null){
             imageSpan.setOnDeleteListener(new ImageDelete() {
                 @Override
                 public void onDelete(View view, String imgUrl) {
-                    int start = text.getSpanStart(imageSpan);
-                    int end = text.getSpanEnd(imageSpan);
-                    text.delete(start, end);
+                    //必须执行的逻辑
+                    int start = editText.getText().getSpanStart(imageSpan);
+                    int end = editText.getText().getSpanEnd(imageSpan);
+                    editText.getText().delete(start, end);
+
+                    editText.setShowSoftInputOnFocus(false);
+
+                    //用户定义的逻辑
                     image.getDelete().onDelete(view, imgUrl);
                 }
             });

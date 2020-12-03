@@ -1,63 +1,71 @@
 package com.shine56.richtextx.util
 
-import android.graphics.*
+import android.R.id.edit
+import android.content.Context
+import android.graphics.Typeface
+import android.text.InputType
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.StyleSpan
-import android.util.Log
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import androidx.core.content.ContextCompat.getSystemService
+import com.shine56.richtextx.api.ImageClick
 import com.shine56.richtextx.api.ImageDelete
 import com.shine56.richtextx.bean.Image
 import com.shine56.richtextx.view.ClickableImageSpan
 import kotlinx.coroutines.*
+
 
 class RichEditUtil(private val editText: EditText) {
 
     var fontSize = 15
     var isBold = false
 
+    private val inputType = editText.inputType
+
     /**
      * 设置图片栈，解决快速插入多张图片时顺序出错的问题
      */
-//    private var i=0
-//    private var isFree = true
-//    private var isQuery = false
-//    private val imageList = arrayListOf<RichEditText.InsertPhotoBuilder>()
-//    fun insertPhoto(image: RichEditText.InsertPhotoBuilder){
-//        imageList.add(image)
-//        if (!isQuery){
-//            query()
-//        }
-//    }
-//    private fun query() {
-//        isQuery = true
-//        val job = Job()
-//        val scope = CoroutineScope(job)
-//        scope.launch(Dispatchers.IO) {
-//            Log.d("调试", "-------------------------轮询开始")
-//            while (imageList.isNotEmpty()){
-//                //Log.d("调试", "***************轮询中")
-//                if(isFree){
-//                    isFree = false
-//                    Log.d("调试", "查询到空闲")
-//                    val image = imageList[0]
-//                    imageList.removeAt(0)
-//                    Log.d("调试", "图片地址${image.imgUrl}")
-//                    insertPhoto(image.imgUrl, image.drawableGet, image.imageClick, image.imageDelete)
-//                }
-//            }
-//            isQuery = false
-//            Log.d("调试", "-------------------------轮询结束")
-//            while (!isFree){
-//               // Log.d("调试", "插入图片还没结束")
-//            }
-//            scope.cancel()
-//            Log.d("调试", "协程域取消")
-//
-//        }
-//    }
+   /* private var i=0
+    private var isFree = true
+    private var isQuery = false
+    private val imageList = arrayListOf<RichEditText.InsertPhotoBuilder>()
+    fun insertPhoto(image: RichEditText.InsertPhotoBuilder){
+        imageList.add(image)
+        if (!isQuery){
+            query()
+        }
+    }
+    private fun query() {
+        isQuery = true
+        val job = Job()
+        val scope = CoroutineScope(job)
+        scope.launch(Dispatchers.IO) {
+            Log.d("调试", "-------------------------轮询开始")
+            while (imageList.isNotEmpty()){
+                //Log.d("调试", "***************轮询中")
+                if(isFree){
+                    isFree = false
+                    Log.d("调试", "查询到空闲")
+                    val image = imageList[0]
+                    imageList.removeAt(0)
+                    Log.d("调试", "图片地址${image.imgUrl}")
+                    insertPhoto(image.imgUrl, image.drawableGet, image.imageClick, image.imageDelete)
+                }
+            }
+            isQuery = false
+            Log.d("调试", "-------------------------轮询结束")
+            while (!isFree){
+               // Log.d("调试", "插入图片还没结束")
+            }
+            scope.cancel()
+            Log.d("调试", "协程域取消")
+
+        }
+    }*/
 
     /**
      * 使用协程管理插入图片的逻辑。将用户定义的获取drawable的逻辑方式IO线程，在主线程更新UI
@@ -99,12 +107,20 @@ class RichEditUtil(private val editText: EditText) {
             //editText.needRefreshText = false
             setText(spannableString)
 
-            //点击事件，无需判空
-            Log.d("调试", "insertPhoto: 设置点击事件")
-            if(image.click == null){
-                Log.d("调试", "insertPhoto: 点击事件为空")
+            //点击事件
+           // imageSpan.setOnCLickListener(image.click)
+            image.click?.let {
+                imageSpan.setOnCLickListener(ImageClick { view, imgUrl ->
+                    //必须执行的逻辑
+                    editText.showSoftInputOnFocus = false
+                    editText.isCursorVisible = false
+//                    val index = editText.selectionStart
+//                    editText.setSelection(0)
+                    //用户定义的逻辑
+                    it.onClick(view, imgUrl)
+                })
             }
-            imageSpan.setOnCLickListener(image.click)
+
 
             //删除事件，如果事件为空则不设置
             image.delete?.let {
@@ -114,6 +130,8 @@ class RichEditUtil(private val editText: EditText) {
                         val start = it.getSpanStart(imageSpan)
                         val end = it.getSpanEnd(imageSpan)
                         it.delete(start, end)
+
+                        editText.showSoftInputOnFocus = false
                     }
                     //用户定义的逻辑
                     it.onDelete(view, url)

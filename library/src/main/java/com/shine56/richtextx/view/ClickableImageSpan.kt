@@ -5,10 +5,10 @@ import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.text.style.DynamicDrawableSpan
 import android.text.style.ImageSpan
-import android.util.Log
 import android.view.View
 import com.shine56.richtextx.api.ImageClick
 import com.shine56.richtextx.api.ImageDelete
+
 
 class ClickableImageSpan(drawable: Drawable, private val imgUrl: String) :
     ImageSpan(drawable, imgUrl, DynamicDrawableSpan.ALIGN_BASELINE) {
@@ -19,7 +19,7 @@ class ClickableImageSpan(drawable: Drawable, private val imgUrl: String) :
     private var onClick: ImageClick? = null
     private var onDelete: ImageDelete? = null
 
-    fun setOnCLickListener(listener: ImageClick?){
+    fun setOnCLickListener(listener: ImageClick){
         onClick = listener
     }
     fun setOnDeleteListener(listener: ImageDelete){
@@ -27,7 +27,7 @@ class ClickableImageSpan(drawable: Drawable, private val imgUrl: String) :
     }
 
     fun onClick(view: View, touchX: Int, touchY: Int){
-        Log.d("调试ClickableImageSpan->", "点击的位置[$touchX, $touchY]  宽[0, $width]  高[$top, $height]")
+       // Log.d("调试ClickableImageSpan->", "点击的位置[$touchX, $touchY]  宽[0, $width]  高[$top, $height]")
         if(touchX > width - 100 && touchX < width  &&
             touchY > top && touchY < top+ 100){
             onDelete?.onDelete(view, imgUrl)
