@@ -9,17 +9,17 @@
 
 ```gradle
 dependencies{
-   implementation 'com.shine56.richtextx:richtextx:1.0.2-beta02'
+   implementation 'com.shine56.richtextx:richtextx:1.0.3-beta'
 }
 ```
 或者Maven：
 
 ```gradle
 <dependency>
-   <groupId>com.shine56.richtextx</groupId>
-   <artifactId>richtextx</artifactId>
-   <version>1.0.2-beta02</version>
-   <type>pom</type>
+	<groupId>com.shine56.richtextx</groupId>
+	<artifactId>richtextx</artifactId>
+	<version>1.0.3-beta</version>
+	<type>pom</type>
 </dependency>
 ```
 
@@ -28,7 +28,7 @@ dependencies{
 像添加EditText一样在布局文件中文件中添加RichEditText
 
 ```xml
-<com.shine56.richtextx.RichEditText
+<com.shine56.richtextx.view.RichEditText
     android:id="@+id/rich_edit_text"
     android:textSize="16sp"
     android:lineHeight="20dp"
@@ -40,65 +40,74 @@ dependencies{
 ```kotlin
 val richEditText = findViewById<RichEditText>(R.id.rich_edit_text)
 
-//插入图片
-richEditText.insertPhoto("R.drawable.example"){
-    //获取drawable逻辑
-}.apply()
+/**
+ * 插入图片
+ */
+val image = richEditText.imageBuilder
+    .setImageUrl("imageUrl")
+    .setDrawableGet {
+        //获取drawable逻辑
+    }.create()
+writeEdit.insertPhoto(image)
 
-//加粗
+//我们还可以为image设置点击事件和删除事件
+val image = writeEdit.imageBuilder
+    .setImageUrl(it)
+    .setDrawableGet {
+       //获取drawable逻辑
+    }
+    .setOnImageCLickListener { view, imgUrl ->
+        //点击事件响应逻辑
+    }
+    .setOnImageDeleteListener { view, imgUrl ->
+        //删除事件响应逻辑
+    }
+    .create()
+
+/**
+ * 加粗
+ */
 richEditText.setBold(true)
 
-//缩进
+/**
+ * 缩进
+ */
 richEditText.indent()
 
-//设置字号
+/**
+ * 设置字号
+ */
 richEditText.setFontSize(28)
-
-//插入图片同时为其设置点击事件
-richEditText.insertPhoto("R.drawable.example"){
-    //获取getDrawable逻辑
-}.setOnCLickListener { view, imgUrl ->
-    //点击事件逻辑
-}.setOnDeleteListener { view, imgUrl ->
-    //点击右上角删除事件逻辑
-}.apply()
-//举例：
-richEditText.insertPhoto("R.drawable.photo") {
-   resources.getDrawable(R.drawable.photo)
-}.setOnCLickListener { _, imgUrl ->
-   Toast.makeText(this, "点击$imgUrl", Toast.LENGTH_SHORT).show()
-}.setOnDeleteListener { _, imgUrl ->
-   Toast.makeText(this, "删除$imgUrl", Toast.LENGTH_SHORT).show()
-}.apply()
-
-
 ```
 #### TextView example
 像添加TextView一样在布局文件中文件中添加RichTextView
 ```xml
-<com.shine56.richtextx.RichTextView
+<com.shine56.richtextx.view.RichTextView
     android:id="@+id/rich_text_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"/>
 ```
 在kotlin文件中
 ```kotlin
+/**
+ * 显示htnl文本
+ */
+ 
 //将editText的文本转成html字符串
 val htmlText = Html.toHtml(richEditText.text)
 
 //将html字符串显示在RichTextView
+val image = writeEdit.imageBuilder
+    .setImageUrl(it)
+    .setDrawableGet {
+       //获取drawable逻辑
+    }.create()
 val richTextView = findViewById<RichTextView>(R.id.rich_text_view)
-val imageGetter = MyImageGetter(this)
-//setTextFromHtml()第一个参数是html文本，第二个参数是Html.ImageGetter实例。
-//开发者需要写一个类继承Html.ImageGetter，实例化其中getDrawable行为。
-richTextView.setTextFromHtml(htmlText, imageGetter).apply()
-
-//为图片设置点击事件
-richTextView.setTextFromHtml(htmlText, imageGetter)
-   .setOnCLickListener { view, imgUrl ->
-       //点击事件逻辑
-   }.apply()
+richTextView.setTextFromHtml(htmlText, image)
 ```
+#### 补充说明
+插入图片为其设置点击事件和删除事件时，事件响应区域如下图所示，点击黄色区域响应点击事件，点击右上角红色区域响应删除事件。
+<img src="https://s3.ax1x.com/2020/12/03/DT3sjf.png" width = "250" height = "250" alt="RichTextX图片事件相应区域说明图" align=center />
 ## License
 [Apache License 2.0](https://github.com/shine56/RichTextX/blob/master/LICENSE)
 
