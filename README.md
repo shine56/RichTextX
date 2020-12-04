@@ -1,7 +1,7 @@
 # RichTextX - 富文本编辑和显示
 ## Description
 使用 RichTextX 只需少量的代码就可以轻松的在Android应用中实现富文本的编辑与Html文本的显示。
-* 基于kotlin、AndroidX
+* 基于kotlin、AndroidX。
 * 支持文本编辑过程中图像的插入删除以及点击事件；更改文本字号；加粗；缩进等富文本编辑；支持Html文件解析并显示。
 * RichTextX中图像的处理和加载由开发者自定义实现，这意味着图文混排的编辑和显示将更加灵活。
 ## Download
