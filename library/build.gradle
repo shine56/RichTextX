@@ -15,7 +15,7 @@ publish {
     userOrg = 'shine56'
     groupId = 'com.shine56.richtextx'
     artifactId = 'richtextx'
-    publishVersion = '1.0.2-beta02'
+    publishVersion = '1.0.3-beta'
     desc = 'A tool that allows Android to easily edit and display rich text'
     website = 'https://github.com/shine56/RichTextX'
     repoName = 'RichTextX'
@@ -64,5 +64,4 @@ dependencies {
 
     //implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9'
-
 }
