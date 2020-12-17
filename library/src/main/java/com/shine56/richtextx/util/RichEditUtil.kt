@@ -1,17 +1,14 @@
 package com.shine56.richtextx.util
 
-import android.R.id.edit
-import android.content.Context
 import android.graphics.Typeface
-import android.text.InputType
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.StyleSpan
-import android.view.inputmethod.InputMethodManager
+import android.util.Log
 import android.widget.EditText
-import androidx.core.content.ContextCompat.getSystemService
+import com.shine56.richtextx.api.HtmlTextX
 import com.shine56.richtextx.api.ImageClick
 import com.shine56.richtextx.api.ImageDelete
 import com.shine56.richtextx.bean.Image
@@ -77,8 +74,7 @@ class RichEditUtil(private val editText: EditText) {
             return
         }
 
-        val job = Job()
-        val scope = CoroutineScope(job)
+        val scope = CoroutineUtil.getScope(editText.hashCode())
 
         //IO线程制作drawable
         val deferred = scope.async(Dispatchers.IO) {
@@ -139,7 +135,6 @@ class RichEditUtil(private val editText: EditText) {
             }
             //editText.needRefreshText = true
             //isFree = true
-            scope.cancel()
         }
     }
 

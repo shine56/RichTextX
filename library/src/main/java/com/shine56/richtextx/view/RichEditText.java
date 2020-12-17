@@ -3,23 +3,23 @@ package com.shine56.richtextx.view;
 import android.content.Context;
 import android.text.Editable;
 import android.text.Html;
-import android.text.Spannable;
 import android.text.TextWatcher;
-import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
-import android.view.inputmethod.InputMethodManager;
+import android.view.View;
 
 import androidx.appcompat.widget.AppCompatEditText;
 
+import com.shine56.richtextx.util.CoroutineUtil;
 import com.shine56.richtextx.util.RichEditUtil;
 import com.shine56.richtextx.util.RichTextXMovementMethod;
-import com.shine56.richtextx.util.RtTagHandler;
 import com.shine56.richtextx.api.HtmlTextX;
 import com.shine56.richtextx.api.ImageBuilder;
 import com.shine56.richtextx.util.ImageBuilderImpl;
 import com.shine56.richtextx.api.RichEditX;
 import com.shine56.richtextx.bean.Image;
+import com.shine56.richtextx.util.RtTagHandler;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +33,7 @@ public class RichEditText extends AppCompatEditText implements HtmlTextX, RichEd
     @Override
     public void setTextFromHtml(String htmlText, Image image) {
         String customText;
-        RtTagHandler tagHandler = new RtTagHandler(image, this);
+        RtTagHandler tagHandler = new RtTagHandler(image, hashCode(),this);
 
         customText = htmlText.replace("span", mySpan);
         customText = customText.replace("img", myImg);
@@ -129,5 +129,11 @@ public class RichEditText extends AppCompatEditText implements HtmlTextX, RichEd
                 setCursorVisible(true);
         }
         return super.onTouchEvent(event);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        CoroutineUtil.INSTANCE.cancel(hashCode());
+        super.onDetachedFromWindow();
     }
 }

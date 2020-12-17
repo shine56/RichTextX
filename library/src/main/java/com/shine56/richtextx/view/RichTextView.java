@@ -7,12 +7,13 @@ import android.util.AttributeSet;
 
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.shine56.richtextx.util.CoroutineUtil;
 import com.shine56.richtextx.util.RichTextXMovementMethod;
-import com.shine56.richtextx.util.RtTagHandler;
 import com.shine56.richtextx.api.HtmlTextX;
 import com.shine56.richtextx.api.ImageBuilder;
 import com.shine56.richtextx.util.ImageBuilderImpl;
 import com.shine56.richtextx.bean.Image;
+import com.shine56.richtextx.util.RtTagHandler;
 
 public class RichTextView extends AppCompatTextView implements HtmlTextX {
 
@@ -32,7 +33,7 @@ public class RichTextView extends AppCompatTextView implements HtmlTextX {
     @Override
     public void setTextFromHtml(String htmlText, Image image) {
         String customText;
-        RtTagHandler tagHandler = new RtTagHandler(image, null);
+        RtTagHandler tagHandler = new RtTagHandler(image, hashCode(),null);
 
         customText = htmlText.replace("span", mySpan);
         customText = customText.replace("img", myImg);
@@ -63,5 +64,12 @@ public class RichTextView extends AppCompatTextView implements HtmlTextX {
     public RichTextView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
+    }
+
+
+    @Override
+    protected void onDetachedFromWindow() {
+        CoroutineUtil.INSTANCE.cancel(hashCode());
+        super.onDetachedFromWindow();
     }
 }
