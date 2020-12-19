@@ -33,7 +33,7 @@ public class RichEditText extends AppCompatEditText implements HtmlTextX, RichEd
     @Override
     public void setTextFromHtml(String htmlText, Image image) {
         String customText;
-        RtTagHandler tagHandler = new RtTagHandler(image, hashCode(),this);
+        RtTagHandler tagHandler = new RtTagHandler(image,this, true);
 
         customText = htmlText.replace("span", mySpan);
         customText = customText.replace("img", myImg);

@@ -5,7 +5,7 @@ import android.content.Context;
 import android.text.Html;
 import android.util.AttributeSet;
 
-import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.AppCompatEditText;
 
 import com.shine56.richtextx.util.CoroutineUtil;
 import com.shine56.richtextx.util.RichTextXMovementMethod;
@@ -15,7 +15,7 @@ import com.shine56.richtextx.util.ImageBuilderImpl;
 import com.shine56.richtextx.bean.Image;
 import com.shine56.richtextx.util.RtTagHandler;
 
-public class RichTextView extends AppCompatTextView implements HtmlTextX {
+public class RichTextView extends AppCompatEditText implements HtmlTextX {
 
     /**
      * 构建富文本图片属性
@@ -27,13 +27,19 @@ public class RichTextView extends AppCompatTextView implements HtmlTextX {
      */
     private void init(){
         setMovementMethod(RichTextXMovementMethod.Companion.getINSTANCE());
+
+        setShowSoftInputOnFocus(false);
+        setCursorVisible(false);
+        setBackground(null);
+        setLongClickable(false);
+
         imageBuilder = new ImageBuilderImpl();
     }
 
     @Override
     public void setTextFromHtml(String htmlText, Image image) {
         String customText;
-        RtTagHandler tagHandler = new RtTagHandler(image, hashCode(),null);
+        RtTagHandler tagHandler = new RtTagHandler(image, this, false);
 
         customText = htmlText.replace("span", mySpan);
         customText = customText.replace("img", myImg);

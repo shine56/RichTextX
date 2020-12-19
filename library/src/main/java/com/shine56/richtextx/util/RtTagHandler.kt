@@ -5,6 +5,7 @@ import android.text.Html.TagHandler
 import android.text.style.AbsoluteSizeSpan
 import android.util.Log
 import android.widget.EditText
+import android.widget.TextView
 import com.shine56.richtextx.api.DrawableGet
 import com.shine56.richtextx.api.HtmlTextX
 import com.shine56.richtextx.api.HtmlTextX.TAG
@@ -12,17 +13,23 @@ import com.shine56.richtextx.api.ImageClick
 import com.shine56.richtextx.api.ImageDelete
 import com.shine56.richtextx.bean.Image
 import com.shine56.richtextx.view.ClickableImageSpan
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.xml.sax.XMLReader
 import java.util.*
+import kotlin.collections.HashMap
 
-class RtTagHandler(private val image: Image, private val viewHashCode: Int, private val editText: EditText?) :
+/**
+ * 自定义解析，img 和 fontSize
+ */
+class RtTagHandler(private val image: Image,
+                   private val editText: EditText,
+                   private val isEditable: Boolean) :
     TagHandler {
     private val attributes = HashMap<String, String?>()
     private var startIndex = 0
     private var stopIndex = 0
+    
+    private val arrInsert = arrayListOf<Insert>()
 
     override fun handleTag(
         opening: Boolean,
@@ -75,54 +82,77 @@ class RtTagHandler(private val image: Image, private val viewHashCode: Int, priv
     }
 
     private fun startImg(text: Editable, drawableGet: DrawableGet) {
-        val src = attributes["src"]
 
-        //IO线程进行插入图片
-        val scope = CoroutineUtil.getScope(viewHashCode)
-        scope.launch (Dispatchers.IO) {
+        //图片+1
+        val src = attributes["src"] ?: "null"
+        val position: Int = arrInsert.size
+        arrInsert.add(Insert(startIndex, src))
 
-            val drawable = drawableGet.getDrawable(src)
-            val width = drawable.intrinsicWidth
-            val height = drawable.intrinsicHeight
+        //IO线程加载图片
+        val scope = CoroutineUtil.getScope(editText.hashCode())
+        val deferred = scope.async(Dispatchers.IO) {
+            drawableGet.getDrawable(src)
+        }
 
-            drawable.setBounds(0, 0, if (width > 0) width else 0, if (height > 0) height else 0)
+        //主线程更新UI
+        scope.launch(Dispatchers.Main) {
 
-            val imageSpan = ClickableImageSpan(drawable, src ?: "url")
-            val spannableString = SpannableString(src)
+            val drawable = deferred.await()
 
-            spannableString.setSpan(
-                imageSpan,
-                0,
-                spannableString.length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-            text.append(spannableString)
+            //阻塞主线程，保持同一时刻只有一张图片在插入
+            runBlocking{
+                val width = drawable.intrinsicWidth
+                val height = drawable.intrinsicHeight
+                drawable.setBounds(0, 0, if (width > 0) width else 0, if (height > 0) height else 0)
 
-            //点击事件
-            if (image.click != null) {
-                if (editText != null) {
-                    imageSpan.setOnCLickListener(ImageClick { view, imgUrl -> //必须执行的逻辑
-                        editText.showSoftInputOnFocus = false
-                        editText.isCursorVisible = false
-                        //用户定义的逻辑
-                        image.click.onClick(view, imgUrl)
-                    })
-                } else {
-                    imageSpan.setOnCLickListener(image.click)
+                val imageSpan = ClickableImageSpan(drawable, src)
+                val spannableString = SpannableString(src)
+                spannableString.setSpan(
+                    imageSpan,
+                    0,
+                    spannableString.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+
+                //寻找插入位置
+                var srcSum = arrInsert[position].startIndex //插入位置
+                for (i in 0 until position){
+                    if(arrInsert[i].isInsert){
+                        srcSum += arrInsert[i].src.length
+                    }
                 }
-            }
+                //插入图片
+                editText.editableText.insert(srcSum, spannableString)
+                arrInsert[position].isInsert = true
+                //Log.d(TAG, "startImg: 第$position 张图片 起始位置：${arrInsert[position].startIndex} 插入位置 $srcSum, ")
 
-            //删除事件
-            if (image.delete != null && editText != null) {
-                imageSpan.setOnDeleteListener(ImageDelete { view, imgUrl -> //必须执行的逻辑
-                    val start = editText.text.getSpanStart(imageSpan)
-                    val end = editText.text.getSpanEnd(imageSpan)
-                    editText.text.delete(start, end)
-                    editText.showSoftInputOnFocus = false
+                //点击事件
+                if (image.click != null) {
+                    if (isEditable) {
+                        imageSpan.setOnCLickListener(ImageClick { view, imgUrl ->
+                            //必须执行的逻辑 隐藏软键盘
+                            editText.showSoftInputOnFocus = false
+                            editText.isCursorVisible = false
+                            //用户定义的逻辑
+                            image.click.onClick(view, imgUrl)
+                        })
+                    } else {
+                        imageSpan.setOnCLickListener(image.click)
+                    }
+                }
 
-                    //用户定义的逻辑
-                    image.delete.onDelete(view, imgUrl)
-                })
+                //删除事件
+                if (image.delete != null && isEditable) {
+                    imageSpan.setOnDeleteListener(ImageDelete { view, imgUrl -> //必须执行的逻辑
+                        val start = editText.text.getSpanStart(imageSpan)
+                        val end = editText.text.getSpanEnd(imageSpan)
+                        editText.text.delete(start, end)
+                        editText.showSoftInputOnFocus = false
+
+                        //用户定义的逻辑
+                        image.delete.onDelete(view, imgUrl)
+                    })
+                }
             }
         }
     }
@@ -196,5 +226,10 @@ class RtTagHandler(private val image: Image, private val viewHashCode: Int, priv
         }
     }
 
+    private inner class Insert(
+        val startIndex: Int,
+        val src: String,
+        var isInsert: Boolean = false //记录图片是否已经加载
+    )
     
 }
