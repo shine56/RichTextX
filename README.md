@@ -106,7 +106,7 @@ richTextView.setTextFromHtml(htmlText, image)
 ```
 #### 补充说明
 插入图片为其设置点击事件和删除事件时，事件响应区域如下图所示，点击黄色区域响应点击事件，点击右上角红色区域响应删除事件。
-![点击事件响应区域图]("https://s3.ax1x.com/2020/12/19/rNxk7j.png)
+![点击事件响应区域图](https://s3.ax1x.com/2020/12/19/rNxk7j.png)
 ## License
 [Apache License 2.0](https://github.com/shine56/RichTextX/blob/master/LICENSE)
 
