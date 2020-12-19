@@ -9,7 +9,7 @@
 
 ```gradle
 dependencies{
-   implementation 'com.shine56.richtextx:richtextx:1.0.3-beta'
+   implementation 'com.shine56.richtextx:richtextx:1.0.4-beta'
 }
 ```
 或者Maven：
