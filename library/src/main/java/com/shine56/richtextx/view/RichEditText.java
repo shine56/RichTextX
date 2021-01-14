@@ -136,4 +136,24 @@ public class RichEditText extends AppCompatEditText implements HtmlTextX, RichEd
         CoroutineUtil.INSTANCE.cancel(hashCode());
         super.onDetachedFromWindow();
     }
+
+    @Override
+    public void setDeleteLineOnThisLine() {
+        richEditUtil.setDeleteLineOnThisLine();
+    }
+
+    @Override
+    public void removeDeleteLineOnThisLine() {
+        richEditUtil.removeDeleteLineOnThisLine();
+    }
+
+    @Override
+    public void setTextColorOnThisLine(int color) {
+        richEditUtil.setTextColorOnThisLine(color);
+    }
+
+    @Override
+    public void removeTextColorOnThisLine() {
+        richEditUtil.removeTextColorOnThisLine();
+    }
 }

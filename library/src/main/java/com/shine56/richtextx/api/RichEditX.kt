@@ -30,6 +30,19 @@ interface RichEditX {
     fun getFontSize(): Int
 
     /**
+     * 为光标所在行设置删除线
+     */
+    fun setDeleteLineOnThisLine()
+    fun removeDeleteLineOnThisLine()
+
+    /**
+     * 为光标所在行设置文本颜色
+     * @param color Int
+     */
+    fun setTextColorOnThisLine(color: Int)
+    fun removeTextColorOnThisLine()
+
+    /**
      * 对光标所在位置插入缩进符号
      */
     fun indent()

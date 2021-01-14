@@ -5,6 +5,8 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.AbsoluteSizeSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.util.Log
 import android.widget.EditText
@@ -147,6 +149,7 @@ class RichEditUtil(private val editText: EditText) {
     fun setFontSizeAndBoldSpan(start: Int, end: Int, before: Int){
         editText.text.let {
             if(before == 0){
+                //字号
                 val absoluteSizeSpan = AbsoluteSizeSpan(fontSize, true)
                 val spannableString = SpannableString(it)
                 spannableString.setSpan(
@@ -155,6 +158,7 @@ class RichEditUtil(private val editText: EditText) {
                     end,
                     Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
 
+                //加粗
                 if(isBold){
                     val styleSpan = StyleSpan(Typeface.BOLD)
                     spannableString.setSpan(
@@ -170,8 +174,104 @@ class RichEditUtil(private val editText: EditText) {
         }
     }
 
+    /**
+     * 为光标所在行设置删除线
+     */
+    fun setDeleteLineOnThisLine(){
+        val line = getThisLineInformation()
+        val str = editText.text.substring(line[1], line[2])
+        val spannableString = SpannableString(str)
+
+        setDeleteLine(spannableString, line[1], line[2])
+    }
+    fun removeDeleteLineOnThisLine(){
+        val line = getThisLineInformation()
+        val spans = editText.text.getSpans(line[1], line[2], StrikethroughSpan::class.java)
+        removeSpan(spans)
+    }
+
+    /**
+     * 设置删除线
+     */
+    fun setDeleteLine(spannableString: SpannableString, start: Int, end: Int){
+        val strikethroughSpan = StrikethroughSpan()
+        setSpan(strikethroughSpan, spannableString, start, end)
+    }
+    fun removeDeleteLine(start: Int, end: Int){
+        val spans = editText.text.getSpans(start, end, StrikethroughSpan::class.java)
+        removeSpan(spans)
+    }
+
+    /**
+     * 为光标所在行设置文本颜色
+     * @param color Int
+     */
+    fun setTextColorOnThisLine(color: Int){
+        val line = getThisLineInformation()
+        val str = editText.text.substring(line[1], line[2])
+        val spannableString = SpannableString(str)
+
+        setTextColor(color, spannableString, line[1], line[2])
+    }
+    fun removeTextColorOnThisLine(){
+        val line = getThisLineInformation()
+        val spans = editText.text.getSpans(line[1], line[2], ForegroundColorSpan::class.java)
+        removeSpan(spans)
+    }
+
+    /**
+     * 设置文本颜色
+     * @param color Int
+     */
+    fun setTextColor( color : Int, spannableString: SpannableString,  start: Int, end: Int){
+        val colorSpan = ForegroundColorSpan(color)
+        setSpan(colorSpan, spannableString, start, end)
+    }
+    fun removeTextColor(start: Int, end: Int){
+        val spans = editText.text.getSpans(start, end, ForegroundColorSpan::class.java)
+        removeSpan(spans)
+    }
+
+    /**
+     * 缩进
+     */
     fun indent(){
         setText("\u3000\u3000")
+    }
+
+    /**
+     * 获取光标所在行信息
+     * @return Array<Int> 0所在行数， 1行起始位置， 2行结束位置
+     */
+    fun getThisLineInformation(): Array<Int>{
+        val index = editText.selectionStart
+        val lineNum = editText.layout.getLineForOffset(index)
+        val end = editText.layout.getLineEnd(lineNum)
+        val start = editText.layout.getLineStart(lineNum)
+
+        return arrayOf(lineNum, start, end)
+    }
+
+    /**
+     * 设置Span
+     * @param what Any
+     * @param spannableString SpannableString
+     * @param start Int
+     * @param end Int
+     */
+    private fun setSpan(what: Any, spannableString: SpannableString, start: Int, end: Int){
+        spannableString.setSpan(
+            what,
+            start,
+            end,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+    }
+
+    private fun <T> removeSpan(spans: Array<T>){
+        for (span in spans){
+            editText.text.removeSpan(span)
+        }
     }
 
     /**
