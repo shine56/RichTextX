@@ -7,7 +7,6 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 
 import androidx.appcompat.widget.AppCompatEditText;
 
@@ -38,7 +37,9 @@ public class RichEditText extends AppCompatEditText implements HtmlTextX, RichEd
         customText = htmlText.replace("span", mySpan);
         customText = customText.replace("img", myImg);
 
+        needRefreshText = false;
         setText(Html.fromHtml(customText, null, tagHandler));
+        needRefreshText = true;
     }
 
     /**
@@ -89,6 +90,10 @@ public class RichEditText extends AppCompatEditText implements HtmlTextX, RichEd
         //设置span点击事件movementMethod
         setMovementMethod(RichTextXMovementMethod.Companion.getINSTANCE());
 
+        //字号
+        richEditUtil.setFontSize((int) getTextSize());
+
+        //文本改变监听
         addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -137,23 +142,14 @@ public class RichEditText extends AppCompatEditText implements HtmlTextX, RichEd
         super.onDetachedFromWindow();
     }
 
+
     @Override
-    public void setDeleteLineOnThisLine() {
-        richEditUtil.setDeleteLineOnThisLine();
+    public boolean switchDeleteLineOnThisLine() {
+        return richEditUtil.switchDeleteLineOnThisLine();
     }
 
     @Override
-    public void removeDeleteLineOnThisLine() {
-        richEditUtil.removeDeleteLineOnThisLine();
-    }
-
-    @Override
-    public void setTextColorOnThisLine(int color) {
-        richEditUtil.setTextColorOnThisLine(color);
-    }
-
-    @Override
-    public void removeTextColorOnThisLine() {
-        richEditUtil.removeTextColorOnThisLine();
+    public boolean switchTextColorOnThisLine(int color) {
+        return richEditUtil.switchTextColorOnThisLine(color);
     }
 }

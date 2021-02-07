@@ -1,17 +1,19 @@
 package com.shine56.richtextx.util
 
+import android.graphics.Color
 import android.text.*
 import android.text.Html.TagHandler
 import android.text.style.AbsoluteSizeSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.StrikethroughSpan
 import android.util.Log
 import android.widget.EditText
-import android.widget.TextView
 import com.shine56.richtextx.api.DrawableGet
 import com.shine56.richtextx.api.HtmlTextX
-import com.shine56.richtextx.api.HtmlTextX.TAG
 import com.shine56.richtextx.api.ImageClick
 import com.shine56.richtextx.api.ImageDelete
 import com.shine56.richtextx.bean.Image
+import com.shine56.richtextx.test.PrintTest
 import com.shine56.richtextx.view.ClickableImageSpan
 import kotlinx.coroutines.*
 import org.xml.sax.XMLReader
@@ -19,17 +21,17 @@ import java.util.*
 import kotlin.collections.HashMap
 
 /**
- * 自定义解析，img 和 fontSize
+ * 自定义解析，img 和 fontSize color
  */
-class RtTagHandler(private val image: Image,
+class RtTagHandler(private val image: Image?,
                    private val editText: EditText,
                    private val isEditable: Boolean) :
     TagHandler {
-    private val attributes = HashMap<String, String?>()
-    private var startIndex = 0
-    private var stopIndex = 0
-    
-    private val arrInsert = arrayListOf<Insert>()
+    private val attributes = HashMap<String, ArrayList<String>>()
+    private var startIndex = 0  //标签起始位置
+    private var stopIndex = 0   //标签结束位置
+
+    private val arrICB = arrayListOf<ImageControlBlock>()
 
     override fun handleTag(
         opening: Boolean,
@@ -38,6 +40,7 @@ class RtTagHandler(private val image: Image,
         xmlReader: XMLReader
     ) {
         processAttributes(xmlReader)
+
         if (tag === HtmlTextX.mySpan || tag === HtmlTextX.myImg) {
             if (opening) {
                 startSpan(tag, output)
@@ -50,6 +53,8 @@ class RtTagHandler(private val image: Image,
 
     private fun startSpan(tag: String, output: Editable) {
         startIndex = output.length
+
+        //解析图像
         if (tag.equals(
                 HtmlTextX.myImg,
                 ignoreCase = true
@@ -61,11 +66,19 @@ class RtTagHandler(private val image: Image,
 
     private fun endSpan(output: Editable) {
         stopIndex = output.length
-        var size = attributes["size"]
-        val style = attributes["style"]
-        if (!TextUtils.isEmpty(style)) {
-            analysisStyle(startIndex, stopIndex, output, style)
+
+        //解析style属性
+        attributes["style"]?.let {
+            for (style in it){
+                Log.d(PrintTest.TAG, "endSpan: style=$style, startIndex=$startIndex, stopIndex$stopIndex")
+                if (!TextUtils.isEmpty(style)) {
+                    analysisStyle(startIndex, stopIndex, output, style)
+                }
+            }
         }
+
+        //解析size属性
+        var size = attributes["size"]?.get(0)
         if (!TextUtils.isEmpty(size)) {
             size = size!!.split("px".toRegex()).toTypedArray()[0]
         }
@@ -84,9 +97,9 @@ class RtTagHandler(private val image: Image,
     private fun startImg(text: Editable, drawableGet: DrawableGet) {
 
         //图片+1
-        val src = attributes["src"] ?: "null"
-        val position: Int = arrInsert.size
-        arrInsert.add(Insert(startIndex, src))
+        val src = attributes["src"]?.get(0) ?: ""
+        val position = arrICB.size
+        arrICB.add(ImageControlBlock(startIndex, src))
 
         //IO线程加载图片
         val scope = CoroutineUtil.getScope(editText.hashCode())
@@ -97,6 +110,7 @@ class RtTagHandler(private val image: Image,
         //主线程更新UI
         scope.launch(Dispatchers.Main) {
 
+            //IO线程加载图片
             val drawable = deferred.await()
 
             //阻塞主线程，保持同一时刻只有一张图片在插入
@@ -115,19 +129,19 @@ class RtTagHandler(private val image: Image,
                 )
 
                 //寻找插入位置
-                var srcSum = arrInsert[position].startIndex //插入位置
+                var insertIndex = arrICB[position].startIndex //插入位置
                 for (i in 0 until position){
-                    if(arrInsert[i].isInsert){
-                        srcSum += arrInsert[i].src.length
+                    if(arrICB[i].isInsert){
+                        insertIndex += arrICB[i].src.length
                     }
                 }
                 //插入图片
-                editText.editableText.insert(srcSum, spannableString)
-                arrInsert[position].isInsert = true
+                editText.editableText.insert(insertIndex, spannableString)
+                arrICB[position].isInsert = true
                 //Log.d(TAG, "startImg: 第$position 张图片 起始位置：${arrInsert[position].startIndex} 插入位置 $srcSum, ")
 
                 //点击事件
-                if (image.click != null) {
+                if (image?.click != null) {
                     if (isEditable) {
                         imageSpan.setOnCLickListener(ImageClick { view, imgUrl ->
                             //必须执行的逻辑 隐藏软键盘
@@ -142,7 +156,7 @@ class RtTagHandler(private val image: Image,
                 }
 
                 //删除事件
-                if (image.delete != null && isEditable) {
+                if (image?.delete != null && isEditable) {
                     imageSpan.setOnDeleteListener(ImageDelete { view, imgUrl -> //必须执行的逻辑
                         val start = editText.text.getSpanStart(imageSpan)
                         val end = editText.text.getSpanEnd(imageSpan)
@@ -159,8 +173,7 @@ class RtTagHandler(private val image: Image,
 
     private fun processAttributes(xmlReader: XMLReader) {
         try {
-            val elementField =
-                xmlReader.javaClass.getDeclaredField("theNewElement")
+            val elementField = xmlReader.javaClass.getDeclaredField("theNewElement")
             elementField.isAccessible = true
             val element = elementField[xmlReader]
             val attsField = element.javaClass.getDeclaredField("theAtts")
@@ -168,8 +181,7 @@ class RtTagHandler(private val image: Image,
             val atts = attsField[element]
             val dataField = atts.javaClass.getDeclaredField("data")
             dataField.isAccessible = true
-            val data =
-                dataField[atts] as Array<String>
+            val data = dataField[atts] as Array<String>
             val lengthField = atts.javaClass.getDeclaredField("length")
             lengthField.isAccessible = true
             val len = lengthField[atts] as Int
@@ -178,7 +190,14 @@ class RtTagHandler(private val image: Image,
              * This is as tight as things can get :)
              * The data index is "just" where the keys and values are stored.
              */
-            for (i in 0 until len) attributes[data[i * 5 + 1]] = data[i * 5 + 4]
+            for (i in 0 until len) {
+                //Log.d(TAG, "processAttributes: data[i * 5 + 1]=${data[i * 5 + 1]} data[i * 5 + 4]=${data[i * 5 + 4]}")
+                if(attributes[data[i * 5 + 1]] == null){
+                    attributes[data[i * 5 + 1]] = arrayListOf(data[i * 5 + 4])
+                }else{
+                    attributes[data[i * 5 + 1]]?.add(data[i * 5 + 4])
+                }
+            }
         } catch (e: Exception) {
         }
     }
@@ -196,20 +215,44 @@ class RtTagHandler(private val image: Image,
         editable: Editable,
         style: String?
     ) {
-        val attrArray = style!!.split(";".toRegex()).toTypedArray()
-        val attrMap: MutableMap<String, String> =
-            HashMap()
+        val attrArray = style?.split(";".toRegex())?.toTypedArray()
+        val attrMap: MutableMap<String, String> = HashMap()
         if (null != attrArray) {
             for (attr in attrArray) {
-                val keyValueArray =
-                    attr.split(":".toRegex()).toTypedArray()
-                if (null != keyValueArray && keyValueArray.size == 2) {
-                    // 记住要去除前后空格
-                    attrMap[keyValueArray[0].trim { it <= ' ' }] =
-                        keyValueArray[1].trim { it <= ' ' }
+                val keyValueArray = attr.split(":".toRegex()).toTypedArray()
+                if (keyValueArray.size == 2) {
+                    // 去除前后空格
+                    attrMap[keyValueArray[0].trim { it <= ' ' }] = keyValueArray[1].trim { it <= ' ' }
                 }
             }
         }
+
+        //删除线
+        val textDecoration = attrMap["text-decoration"]
+        if (!TextUtils.isEmpty(textDecoration) && textDecoration == "line-through") {
+            val strikethroughSpan = StrikethroughSpan()
+            editable.setSpan(
+                strikethroughSpan,
+                startIndex,
+                stopIndex,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        //颜色
+        val colorStr = attrMap["color"]
+        if (!TextUtils.isEmpty(colorStr)) {
+            val color = Color.parseColor(colorStr)
+            val colorSpan = ForegroundColorSpan(color)
+            editable.setSpan(
+                colorSpan,
+                startIndex,
+                stopIndex,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        //字号
         var fontSize = attrMap["font-size"]
         if (!TextUtils.isEmpty(fontSize)) {
             fontSize = fontSize!!.split("px".toRegex()).toTypedArray()[0]
@@ -226,10 +269,10 @@ class RtTagHandler(private val image: Image,
         }
     }
 
-    private inner class Insert(
+    private inner class ImageControlBlock(
         val startIndex: Int,
         val src: String,
         var isInsert: Boolean = false //记录图片是否已经加载
     )
-    
+
 }

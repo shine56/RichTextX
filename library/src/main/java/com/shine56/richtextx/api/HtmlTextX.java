@@ -6,7 +6,6 @@ public interface HtmlTextX {
 
     String mySpan = "myspan";
     String myImg = "myImg";
-    String TAG = "调试";
 
     /**
      * 设置Html文本，它包含两个参数：第一个参数是需要显示的html文本，

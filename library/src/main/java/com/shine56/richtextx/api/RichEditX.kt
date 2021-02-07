@@ -1,6 +1,5 @@
 package com.shine56.richtextx.api
 
-import android.graphics.drawable.Drawable
 import com.shine56.richtextx.bean.Image
 
 /**
@@ -30,17 +29,17 @@ interface RichEditX {
     fun getFontSize(): Int
 
     /**
-     * 为光标所在行设置删除线
+     * 为光标所在行设置删除线，如果已经存在则去除。返回转换状态，true表示设置，false表示去除
+     * @return Boolean
      */
-    fun setDeleteLineOnThisLine()
-    fun removeDeleteLineOnThisLine()
+    fun switchDeleteLineOnThisLine(): Boolean
 
     /**
-     * 为光标所在行设置文本颜色
+     * 为光标所在行设置颜色，如果已经存在则去除。返回转换状态，true表示设置，false表示去除
      * @param color Int
+     * @return Boolean
      */
-    fun setTextColorOnThisLine(color: Int)
-    fun removeTextColorOnThisLine()
+    fun switchTextColorOnThisLine(color: Int): Boolean
 
     /**
      * 对光标所在位置插入缩进符号
