@@ -9,7 +9,7 @@
 
 ```gradle
 dependencies{
-   implementation 'com.shine56.richtextx:richtextx:1.0.3-beta'
+   implementation 'com.shine56.richtextx:richtextx:1.0.4-beta'
 }
 ```
 或者Maven：
@@ -105,12 +105,9 @@ val richTextView = findViewById<RichTextView>(R.id.rich_text_view)
 richTextView.setTextFromHtml(htmlText, image)
 ```
 #### 补充说明
-插入图片为其设置点击事件和删除事件时，事件响应区域如下图所示，点击黄色区域响应点击事件，点击右上角红色区域响应删除事件。
-<img src="https://s3.ax1x.com/2020/12/03/DT3sjf.png" width = "250" height = "250" alt="RichTextX图片事件相应区域说明图" align=center />
+[blog](https://blog.csdn.net/weixin_42619856/article/details/110527709)
 ## License
 [Apache License 2.0](https://github.com/shine56/RichTextX/blob/master/LICENSE)
 
 ## Screenshot
-| 编辑 |显示 |
-|--|--|
-|<img src="https://s1.ax1x.com/2020/10/10/06NlZD.md.jpg" width = "250" height = "550" alt="图片名称" align=center />|<img src="https://s1.ax1x.com/2020/10/10/06NMqO.md.jpg" width = "250" height = "550" alt="图片名称" align=center />
+<img src="https://s1.ax1x.com/2020/10/10/06NlZD.md.jpg" width = "250" height = "550" alt="图片名称" align=center /><img src="https://s1.ax1x.com/2020/10/10/06NMqO.md.jpg" width = "250" height = "550" alt="图片名称" align=center />

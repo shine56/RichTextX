@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-//apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'com.novoda.bintray-release'
 
 buildscript {
     repositories {
@@ -11,15 +11,15 @@ buildscript {
         classpath 'com.novoda:bintray-release:0.9.2'
     }
 }
-//publish {
-//    userOrg = 'shine56'
-//    groupId = 'com.shine56.richtextx'
-//    artifactId = 'richtextx'
-//    publishVersion = '1.0.4-beta'
-//    desc = 'A tool that allows Android to easily edit and display rich text'
-//    website = 'https://github.com/shine56/RichTextX'
-//    repoName = 'RichTextX'
-//}
+publish {
+    userOrg = 'shine56'
+    groupId = 'com.shine56.richtextx'
+    artifactId = 'richtextx'
+    publishVersion = '1.0.4-beta'
+    desc = 'A tool that allows Android to easily edit and display rich text'
+    website = 'https://github.com/shine56/RichTextX'
+    repoName = 'RichTextX'
+}
 
 android {
     compileSdkVersion 29
