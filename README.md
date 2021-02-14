@@ -9,7 +9,7 @@
 
 ```gradle
 dependencies{
-   implementation 'com.shine56.richtextx:richtextx:1.0.4-beta'
+   implementation 'com.shine56.richtextx:richtextx:1.0.5-beta'
 }
 ```
 或者Maven：
@@ -18,7 +18,7 @@ dependencies{
 <dependency>
 	<groupId>com.shine56.richtextx</groupId>
 	<artifactId>richtextx</artifactId>
-	<version>1.0.3-beta</version>
+	<version>1.0.5-beta</version>
 	<type>pom</type>
 </dependency>
 ```
