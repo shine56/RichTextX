@@ -110,5 +110,4 @@ richTextView.setTextFromHtml(htmlText, image)
 [Apache License 2.0](https://github.com/shine56/RichTextX/blob/master/LICENSE)
 
 ## Screenshot
-<img src="https://s1.ax1x.com/2020/10/10/06NMqO.md.jpg" width = "250" height = "550" alt="图片名称" align=center />
-<img src="https://s1.ax1x.com/2020/10/10/06NlZD.md.jpg" width = "250" height = "550" alt="图片名称" align=center />
+<img src="https://s1.ax1x.com/2020/10/10/06NMqO.md.jpg" width = "250" height = "550" alt="图片名称" align=center />    <img src="https://s1.ax1x.com/2020/10/10/06NlZD.md.jpg" width = "250" height = "550" alt="图片名称" align=center />
