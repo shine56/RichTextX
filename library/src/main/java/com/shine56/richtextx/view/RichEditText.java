@@ -3,21 +3,22 @@ package com.shine56.richtextx.view;
 import android.content.Context;
 import android.text.Editable;
 import android.text.Html;
+import android.text.SpannableString;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import androidx.appcompat.widget.AppCompatEditText;
 
+import com.shine56.richtextx.revoke.Revoker;
 import com.shine56.richtextx.util.CoroutineUtil;
 import com.shine56.richtextx.util.RichEditUtil;
 import com.shine56.richtextx.util.RichTextXMovementMethod;
 import com.shine56.richtextx.api.HtmlTextX;
-import com.shine56.richtextx.api.ImageBuilder;
-import com.shine56.richtextx.util.ImageBuilderImpl;
+import com.shine56.richtextx.image.api.ImageBuilder;
+import com.shine56.richtextx.image.ImageBuilderImpl;
 import com.shine56.richtextx.api.RichEditX;
-import com.shine56.richtextx.bean.Image;
+import com.shine56.richtextx.image.Image;
 import com.shine56.richtextx.util.RtTagHandler;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,8 +27,44 @@ public class RichEditText extends AppCompatEditText implements HtmlTextX, RichEd
 
     //判断是否需要更新文本
     private boolean needRefreshText = true;
+    public boolean needPushRevokeStack = true;
 
     private RichEditUtil richEditUtil = new RichEditUtil(this);
+    private Revoker revoker = new Revoker(this);
+
+    private void init(){
+        //设置span点击事件movementMethod
+        setMovementMethod(RichTextXMovementMethod.Companion.getINSTANCE());
+
+        //字号
+        richEditUtil.setFontSize((int) getTextSize());
+
+        //文本改变监听
+        addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //从start开始的count个字符替换长度为before的旧文本，before==0 说明是新增
+                //加粗与字号
+                if(needRefreshText) {
+                    needPushRevokeStack = false;
+                    richEditUtil.setFontSizeAndBoldSpan(start, start+count, before);
+                    needPushRevokeStack = true;
+                }
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                if(needPushRevokeStack) revoker.add(new SpannableString(getText()));
+            }
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    @Override
+    public boolean revoke() {
+        return revoker.revoke();
+    }
 
     @Override
     public void setTextFromHtml(String htmlText, Image image) {
@@ -86,30 +123,6 @@ public class RichEditText extends AppCompatEditText implements HtmlTextX, RichEd
         richEditUtil.indent();
     }
 
-    private void init(){
-        //设置span点击事件movementMethod
-        setMovementMethod(RichTextXMovementMethod.Companion.getINSTANCE());
-
-        //字号
-        richEditUtil.setFontSize((int) getTextSize());
-
-        //文本改变监听
-        addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //加粗与字号
-                if(needRefreshText) {
-                    richEditUtil.setFontSizeAndBoldSpan(start, start+count, before);
-                }
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-    }
-
     public RichEditText(Context context) {
         super(context);
         init();
@@ -142,14 +155,27 @@ public class RichEditText extends AppCompatEditText implements HtmlTextX, RichEd
         super.onDetachedFromWindow();
     }
 
-
     @Override
     public boolean switchDeleteLineOnThisLine() {
-        return richEditUtil.switchDeleteLineOnThisLine();
+        needRefreshText = false;
+        boolean result = richEditUtil.switchDeleteLineOnThisLine();
+        needRefreshText = true;
+        return result;
     }
 
     @Override
     public boolean switchTextColorOnThisLine(int color) {
-        return richEditUtil.switchTextColorOnThisLine(color);
+        needRefreshText = false;
+        boolean result = richEditUtil.switchTextColorOnThisLine(color);
+        needRefreshText = true;
+        return result;
+    }
+
+    @Override
+    public boolean switchToListOnThisLine() {
+        needRefreshText = false;
+        boolean result = richEditUtil.switchToListOnThisLine();
+        needRefreshText = true;
+        return result;
     }
 }

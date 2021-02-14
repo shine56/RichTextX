@@ -1,6 +1,7 @@
 package com.shine56.richtextx.api;
 
-import com.shine56.richtextx.bean.Image;
+import com.shine56.richtextx.image.Image;
+import com.shine56.richtextx.image.api.ImageBuilder;
 
 public interface HtmlTextX {
 

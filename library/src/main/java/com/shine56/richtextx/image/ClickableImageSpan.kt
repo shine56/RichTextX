@@ -1,4 +1,4 @@
-package com.shine56.richtextx.view
+package com.shine56.richtextx.image
 
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -6,8 +6,8 @@ import android.graphics.drawable.Drawable
 import android.text.style.DynamicDrawableSpan
 import android.text.style.ImageSpan
 import android.view.View
-import com.shine56.richtextx.api.ImageClick
-import com.shine56.richtextx.api.ImageDelete
+import com.shine56.richtextx.image.api.ImageClick
+import com.shine56.richtextx.image.api.ImageDelete
 
 
 class ClickableImageSpan(drawable: Drawable, private val imgUrl: String) :

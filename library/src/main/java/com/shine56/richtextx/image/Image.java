@@ -1,8 +1,8 @@
-package com.shine56.richtextx.bean;
+package com.shine56.richtextx.image;
 
-import com.shine56.richtextx.api.DrawableGet;
-import com.shine56.richtextx.api.ImageClick;
-import com.shine56.richtextx.api.ImageDelete;
+import com.shine56.richtextx.image.api.DrawableGet;
+import com.shine56.richtextx.image.api.ImageClick;
+import com.shine56.richtextx.image.api.ImageDelete;
 
 public class Image{
     private String imageUrl = "imageUrl";

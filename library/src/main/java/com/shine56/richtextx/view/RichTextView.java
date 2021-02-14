@@ -10,9 +10,9 @@ import androidx.appcompat.widget.AppCompatEditText;
 import com.shine56.richtextx.util.CoroutineUtil;
 import com.shine56.richtextx.util.RichTextXMovementMethod;
 import com.shine56.richtextx.api.HtmlTextX;
-import com.shine56.richtextx.api.ImageBuilder;
-import com.shine56.richtextx.util.ImageBuilderImpl;
-import com.shine56.richtextx.bean.Image;
+import com.shine56.richtextx.image.api.ImageBuilder;
+import com.shine56.richtextx.image.ImageBuilderImpl;
+import com.shine56.richtextx.image.Image;
 import com.shine56.richtextx.util.RtTagHandler;
 
 public class RichTextView extends AppCompatEditText implements HtmlTextX {
@@ -71,7 +71,6 @@ public class RichTextView extends AppCompatEditText implements HtmlTextX {
         super(context, attrs, defStyleAttr);
         init();
     }
-
 
     @Override
     protected void onDetachedFromWindow() {

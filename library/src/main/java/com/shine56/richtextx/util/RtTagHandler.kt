@@ -8,17 +8,18 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StrikethroughSpan
 import android.util.Log
 import android.widget.EditText
-import com.shine56.richtextx.api.DrawableGet
 import com.shine56.richtextx.api.HtmlTextX
-import com.shine56.richtextx.api.ImageClick
-import com.shine56.richtextx.api.ImageDelete
-import com.shine56.richtextx.bean.Image
-import com.shine56.richtextx.test.PrintTest
-import com.shine56.richtextx.view.ClickableImageSpan
-import kotlinx.coroutines.*
+import com.shine56.richtextx.image.ClickableImageSpan
+import com.shine56.richtextx.image.api.DrawableGet
+import com.shine56.richtextx.image.Image
+import com.shine56.richtextx.image.api.ImageClick
+import com.shine56.richtextx.image.api.ImageDelete
+import com.shine56.richtextx.test.PrintTest.TAG
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.xml.sax.XMLReader
-import java.util.*
-import kotlin.collections.HashMap
 
 /**
  * 自定义解析，img 和 fontSize color
@@ -30,7 +31,7 @@ class RtTagHandler(private val image: Image?,
     private val attributes = HashMap<String, ArrayList<String>>()
     private var startIndex = 0  //标签起始位置
     private var stopIndex = 0   //标签结束位置
-
+    
     private val arrICB = arrayListOf<ImageControlBlock>()
 
     override fun handleTag(
@@ -70,7 +71,7 @@ class RtTagHandler(private val image: Image?,
         //解析style属性
         attributes["style"]?.let {
             for (style in it){
-                Log.d(PrintTest.TAG, "endSpan: style=$style, startIndex=$startIndex, stopIndex$stopIndex")
+                Log.d(TAG, "endSpan: style=$style, startIndex=$startIndex, stopIndex$stopIndex")
                 if (!TextUtils.isEmpty(style)) {
                     analysisStyle(startIndex, stopIndex, output, style)
                 }
@@ -102,7 +103,8 @@ class RtTagHandler(private val image: Image?,
         arrICB.add(ImageControlBlock(startIndex, src))
 
         //IO线程加载图片
-        val scope = CoroutineUtil.getScope(editText.hashCode())
+        val scope =
+            CoroutineUtil.getScope(editText.hashCode())
         val deferred = scope.async(Dispatchers.IO) {
             drawableGet.getDrawable(src)
         }
@@ -119,7 +121,8 @@ class RtTagHandler(private val image: Image?,
                 val height = drawable.intrinsicHeight
                 drawable.setBounds(0, 0, if (width > 0) width else 0, if (height > 0) height else 0)
 
-                val imageSpan = ClickableImageSpan(drawable, src)
+                val imageSpan =
+                    ClickableImageSpan(drawable, src)
                 val spannableString = SpannableString(src)
                 spannableString.setSpan(
                     imageSpan,
@@ -274,5 +277,5 @@ class RtTagHandler(private val image: Image?,
         val src: String,
         var isInsert: Boolean = false //记录图片是否已经加载
     )
-
+    
 }

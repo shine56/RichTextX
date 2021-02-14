@@ -1,4 +1,4 @@
-package com.shine56.richtextx.api;
+package com.shine56.richtextx.image.api;
 
 import android.view.View;
 

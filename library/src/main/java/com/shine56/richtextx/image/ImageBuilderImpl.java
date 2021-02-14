@@ -1,10 +1,9 @@
-package com.shine56.richtextx.util;
+package com.shine56.richtextx.image;
 
-import com.shine56.richtextx.api.DrawableGet;
-import com.shine56.richtextx.api.ImageBuilder;
-import com.shine56.richtextx.api.ImageClick;
-import com.shine56.richtextx.api.ImageDelete;
-import com.shine56.richtextx.bean.Image;
+import com.shine56.richtextx.image.api.DrawableGet;
+import com.shine56.richtextx.image.api.ImageBuilder;
+import com.shine56.richtextx.image.api.ImageClick;
+import com.shine56.richtextx.image.api.ImageDelete;
 
 public class ImageBuilderImpl implements ImageBuilder {
     private Image image = new Image();

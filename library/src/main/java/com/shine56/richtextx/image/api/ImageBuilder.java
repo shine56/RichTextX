@@ -1,6 +1,6 @@
-package com.shine56.richtextx.api;
+package com.shine56.richtextx.image.api;
 
-import com.shine56.richtextx.bean.Image;
+import com.shine56.richtextx.image.Image;
 
 public interface ImageBuilder {
     ImageBuilder setImageUrl(String imageUrl);

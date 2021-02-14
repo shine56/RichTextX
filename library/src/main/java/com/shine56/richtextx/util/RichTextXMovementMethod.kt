@@ -3,12 +3,9 @@ package com.shine56.richtextx.util
 import android.text.Selection
 import android.text.Spannable
 import android.text.method.LinkMovementMethod
-import android.text.style.ClickableSpan
-import android.util.Log
 import android.view.MotionEvent
 import android.widget.TextView
-import com.shine56.richtextx.api.HtmlTextX.TAG
-import com.shine56.richtextx.view.ClickableImageSpan
+import com.shine56.richtextx.image.ClickableImageSpan
 import kotlin.math.abs
 
 class RichTextXMovementMethod: LinkMovementMethod() {
