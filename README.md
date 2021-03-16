@@ -104,8 +104,6 @@ val image = writeEdit.imageBuilder
 val richTextView = findViewById<RichTextView>(R.id.rich_text_view)
 richTextView.setTextFromHtml(htmlText, image)
 ```
-#### 补充说明
-[blog](https://blog.csdn.net/weixin_42619856/article/details/110527709)
 ## License
 [Apache License 2.0](https://github.com/shine56/RichTextX/blob/master/LICENSE)
 
